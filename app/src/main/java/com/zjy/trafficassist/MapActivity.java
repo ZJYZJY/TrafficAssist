@@ -3,9 +3,7 @@ package com.zjy.trafficassist;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -42,8 +40,8 @@ public class MapActivity extends AppCompatActivity
     // 定位
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
-    //Snackbar的容器
-//    private CoordinatorLayout container;
+
+    private FloatingActionButton fab_post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +50,9 @@ public class MapActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        container = (CoordinatorLayout)findViewById(R.id.container);
+        fab_post = (FloatingActionButton)findViewById(R.id.fab_post);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MapActivity.this, PostMessage.class));
@@ -74,8 +71,6 @@ public class MapActivity extends AppCompatActivity
         //地图初始化
         mapView = (MapView) findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
-//        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮可见
-//        aMap.getUiSettings().setCompassEnabled(true);//设置指南针按钮可见
         Initial();
     }
 
@@ -149,7 +144,6 @@ public class MapActivity extends AppCompatActivity
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
                 Log.e("AmapErr", errText);
-//                Snackbar.make(container, errText, Snackbar.LENGTH_LONG).show();
                 Toast.makeText(getApplicationContext(), errText, Toast.LENGTH_LONG).show();
             }
         }
@@ -180,7 +174,31 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.view_change) {
+        //设置地图类型
+            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+            final String[] views = {"标准地图", "卫星地图", "夜间地图"};
+            builder.setItems(views, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case 0:aMap.setMapType(AMap.MAP_TYPE_NORMAL);break;
+                        case 1:aMap.setMapType(AMap.MAP_TYPE_SATELLITE);break;
+                        case 2:aMap.setMapType(AMap.MAP_TYPE_NIGHT);break;
+                    }
+                }
+            }).show();
+            return true;
+        }else if(id == R.id.rt_traffic) {
+        //设置实时交通路况
+            if(item.isChecked()){
+                item.setChecked(false);
+                aMap.setTrafficEnabled(false);
+            }
+            else{
+                item.setChecked(true);
+                aMap.setTrafficEnabled(true);
+            }
             return true;
         }
 
@@ -193,17 +211,17 @@ public class MapActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.user_info) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.call_record) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_refer) {
 
-        } else if (id == R.id.nav_manage) {
+        //} else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_about) {
 
         }
 
