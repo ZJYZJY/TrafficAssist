@@ -6,12 +6,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AlertDialog;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,6 +39,7 @@ public class PostMessage extends AppCompatActivity {
 
         //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.activity_post_message);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.activity_bar);
 
         container = (CoordinatorLayout)findViewById(R.id.container);
@@ -119,5 +122,18 @@ public class PostMessage extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                finish();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
