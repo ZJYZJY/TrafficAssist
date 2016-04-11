@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -27,9 +28,11 @@ public class PostMessage extends AppCompatActivity {
 
     public static final int TAKE_PHOTO = 0;
     public static final int BROWSE_PHOTO = 1;
+    private int PIC_SELECTED = 0;
     private ImageView add_pic;
     private Button btn_commit;
     private Uri imageUri;
+    private Bitmap bitmap;
     //Snackbar的容器
     private CoordinatorLayout container;
 
@@ -42,51 +45,72 @@ public class PostMessage extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.activity_bar);
 
-        container = (CoordinatorLayout)findViewById(R.id.container);
-        add_pic = (ImageView)findViewById(R.id.add_picture);
-        btn_commit = (Button)findViewById(R.id.btn_commit);
+        container = (CoordinatorLayout) findViewById(R.id.container);
+        add_pic = (ImageView) findViewById(R.id.add_picture);
+        btn_commit = (Button) findViewById(R.id.btn_commit);
 
-        add_pic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PostMessage.this);
-                final String[] ways = {"拍照", "从手机相册中选择"};
-                //    设置一个下拉的列表选择项
-                builder.setItems(ways, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(PostMessage.this, "选择为：" + ways[which], Toast.LENGTH_SHORT).show();
-                        //创建File对象，用于存储照片
-                        File image = new File(Environment.getExternalStorageDirectory(), "1.jpg");
-                        try {
-                            if (image.exists()) {
-                                image.delete();
+        if(PIC_SELECTED == 0) {
+            add_pic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PostMessage.this);
+                    final String[] ways = {"拍照", "从手机相册中选择"};
+                    //    设置一个下拉的列表选择项
+                    builder.setItems(ways, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(PostMessage.this, "选择为：" + ways[which], Toast.LENGTH_SHORT).show();
+                            //创建File对象，用于存储照片
+                            File image = new File(Environment.getExternalStorageDirectory(), "1.jpg");
+                            try {
+                                if (image.exists()) {
+                                    image.delete();
+                                }
+                                image.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                            image.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            imageUri = Uri.fromFile(image);
+                            switch (which) {
+                                case 0:
+                                    Intent camera = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                                    camera.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                    startActivityForResult(camera, TAKE_PHOTO);
+                                    break;
+                                case 1:
+                                    //Intent picture = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                    Intent picture = new Intent(Intent.ACTION_GET_CONTENT);
+                                    picture.addCategory(Intent.CATEGORY_OPENABLE);
+                                    picture.setType("image/*");
+                                    picture.putExtra("return-data", true);
+                                    //picture.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                    startActivityForResult(picture, BROWSE_PHOTO);
+                                    break;
+                            }
                         }
-                        imageUri = Uri.fromFile(image);
-                        switch (which) {
-                            case 0:
-                                Intent camera = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                                camera.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                                startActivityForResult(camera, TAKE_PHOTO);
-                                break;
-                            case 1:
-                                Intent picture = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                picture.setType("image/*");
-                                //picture.putExtra();
-                                //picture.putExtra();
-                                picture.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                                startActivityForResult(picture, BROWSE_PHOTO);
-                                break;
+                    });
+                    builder.show();
+                }
+            });
+        }else {
+            add_pic.setOnClickListener(new View.OnClickListener() { // 点击放大
+                public void onClick(View paramView) {
+                    LayoutInflater inflater = LayoutInflater.from(PostMessage.this);
+                    View imgEntryView = inflater.inflate(R.layout.large_image, null); // 加载自定义的布局文件
+                    final AlertDialog dialog = new AlertDialog.Builder(PostMessage.this).create();
+                    ImageView large_image = (ImageView) imgEntryView.findViewById(R.id.large_imageview);
+                    large_image.setImageBitmap(bitmap);
+                    dialog.setView(imgEntryView); // 自定义dialog
+                    dialog.show();
+                    // 点击布局文件（也可以理解为点击大图）后关闭dialog，这里的dialog不需要按钮
+                    imgEntryView.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View paramView) {
+                            dialog.cancel();
                         }
-                    }
-                });
-                builder.show();
-            }
-        });
+                    });
+                }
+            });
+        }
 
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,21 +128,29 @@ public class PostMessage extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
+        switch (requestCode) {
             case TAKE_PHOTO:
-                try{
-                    Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-                    add_pic.setImageBitmap(bitmap);
-                }catch (FileNotFoundException e){
-                    e.printStackTrace();
+                if (resultCode == RESULT_OK) {
+                    try {
+                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        add_pic.setImageBitmap(bitmap);
+                        PIC_SELECTED = PIC_SELECTED + 1;
+                        System.out.println(PIC_SELECTED);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case BROWSE_PHOTO:
-                try{
-                    Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-                    add_pic.setImageBitmap(bitmap);
-                }catch (FileNotFoundException e){
-                    e.printStackTrace();
+                if (resultCode == RESULT_OK) {
+                    //Bitmap bitmap = null;
+                    try {
+                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        add_pic.setImageBitmap(bitmap);
+                        PIC_SELECTED = PIC_SELECTED + 1;
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
@@ -127,7 +159,7 @@ public class PostMessage extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 //NavUtils.navigateUpFromSameTask(this);
                 finish();
