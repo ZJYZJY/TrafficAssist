@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.zjy.trafficassist.LoginActivity">
+    tools:context=".ui.LoginActivity">
 
     <!-- Login progress -->
 
@@ -53,14 +53,15 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/email_sign_in_button"
+        android:id="@+id/user_sign_in_button"
         style="?android:textAppearanceSmall"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
         android:background="@drawable/btn_commit"
-        android:text="@string/action_sign_in" />
+        android:text="@string/action_sign_in"
+        android:textColor="#ffffff" />
 
     <RelativeLayout
         android:layout_width="match_parent"

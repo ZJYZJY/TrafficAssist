@@ -1,4 +1,4 @@
-package com.zjy.trafficassist;
+package com.zjy.trafficassist.ui;
 
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -6,7 +6,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.DialogInterface;
@@ -19,6 +18,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.zjy.trafficassist.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,7 +46,7 @@ public class PostMessage extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.activity_bar);
 
-        container = (CoordinatorLayout) findViewById(R.id.container);
+        container = (CoordinatorLayout) findViewById(R.id.post_container);
         add_pic = (ImageView) findViewById(R.id.add_picture);
         btn_commit = (Button) findViewById(R.id.btn_commit);
 

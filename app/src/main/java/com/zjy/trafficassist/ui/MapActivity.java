@@ -1,4 +1,4 @@
-package com.zjy.trafficassist;
+package com.zjy.trafficassist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +31,7 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.LatLng;
+import com.zjy.trafficassist.R;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -44,10 +45,10 @@ public class MapActivity extends AppCompatActivity
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
 
-    private LayoutInflater inflater;
+    //private LayoutInflater inflater;
     private FloatingActionButton fab_post;
     private Button login;
-    private LinearLayout linearlayout;
+    //private LinearLayout linearlayout;
     private NavigationView navigationView;
     //private ImageView compass;
 
