@@ -1,10 +1,8 @@
 package com.zjy.trafficassist.ui;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,16 +11,15 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.User;
+import com.zjy.trafficassist.WebService;
 
 public class SignupActivity extends AppCompatActivity {
 
-
-    //private DatabaseHelper db = new DatabaseHelper(this);
-    //private SQLiteDatabase database = db.getWritableDatabase();
     private DatabaseManager DBManager;
     private User user = new User();
 
@@ -59,8 +56,6 @@ public class SignupActivity extends AppCompatActivity {
 
         user.setUsername(new_username.getText().toString());
         user.setPassword(new_passname.getText().toString());
-//        user.setUsername("18767549068");
-//        user.setPassword("zxcvbnm");
 
         boolean cancel = false;
         View focusView = null;
@@ -89,20 +84,41 @@ public class SignupActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             // perform the user login attempt.
-            if(RegisterUser(user)){
-                Snackbar.make(container, "注册成功", Snackbar.LENGTH_LONG).show();
-                finish();
-            }else {
-                Snackbar.make(container, "注册失败", Snackbar.LENGTH_LONG).show();
-            }
+            new AsyncTask<Void, Void, Boolean>(){
+                String ReturnCode;
+
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    ReturnCode = WebService.Login_Register(user.getUsername(), user.getPassword(), WebService.REGISTER);
+                    return Boolean.parseBoolean(ReturnCode);
+                }
+
+                @Override
+                protected void onPostExecute(final Boolean success) {
+                    super.onPostExecute(success);
+                    if (success) {
+                        Toast.makeText(SignupActivity.this, "登陆成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(SignupActivity.this, "登陆失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }.execute();
+//            if(RegisterUser(user)){
+//                //Snackbar.make(container, "注册成功", Snackbar.LENGTH_LONG).show();
+//                Toast.makeText(SignupActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+//                finish();
+//            }else {
+//                //Snackbar.make(container, "注册失败", Snackbar.LENGTH_LONG).show();
+//                Toast.makeText(SignupActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
-    private boolean RegisterUser(User user){
+    private boolean RegisterUser(User user) {
 
         try {
             DBManager.Register(user);
-//            System.out.println(DBManager.getCount());
             return true;
         }catch (Exception e){
             e.printStackTrace();

@@ -44,7 +44,7 @@ public class DatabaseManager {
         return false;
     }
 
-    public long getCount(){
+    public long getUserCount(){
         //获取数据总数
         Cursor cursor =database.rawQuery("select count(*) from user", null);
         cursor.moveToFirst();

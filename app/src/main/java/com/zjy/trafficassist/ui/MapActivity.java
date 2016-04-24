@@ -4,10 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -45,12 +44,12 @@ public class MapActivity extends AppCompatActivity
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
 
-    //private LayoutInflater inflater;
     private FloatingActionButton fab_post;
     private Button login;
-    //private LinearLayout linearlayout;
     private NavigationView navigationView;
-    //private ImageView compass;
+    private DrawerLayout drawer;
+
+    private boolean first_show;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +57,7 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        first_show = true;
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         fab_post = (FloatingActionButton) findViewById(R.id.fab_post);
@@ -73,7 +73,7 @@ public class MapActivity extends AppCompatActivity
         Initial();
         //compass.setRotation(aMap.getCameraPosition().bearing);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -160,7 +160,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -227,8 +227,8 @@ public class MapActivity extends AppCompatActivity
 
         if (id == R.id.user_info) {
 
-        } else if (id == R.id.call_record) {
-
+        } else if (id == R.id.alarm_history) {
+            startActivity(new Intent(MapActivity.this, AlarmHistory.class));
         } else if (id == R.id.nav_refer) {
 
         } else if (id == R.id.nav_setting) {
@@ -237,7 +237,7 @@ public class MapActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -278,6 +278,7 @@ public class MapActivity extends AppCompatActivity
                 startActivity(new Intent(MapActivity.this, LoginActivity.class));
                 break;
         }
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     //MapView生命周期
@@ -285,6 +286,10 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        if(LoginActivity.login_status && first_show) {
+            Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
+            first_show = false;
+        }
     }
 
     @Override

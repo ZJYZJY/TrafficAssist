@@ -1,5 +1,6 @@
 package com.zjy.trafficassist.ui;
 
+import android.content.ContentResolver;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
@@ -41,16 +42,14 @@ public class PostMessage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.activity_post_message);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.activity_bar);
 
         container = (CoordinatorLayout) findViewById(R.id.post_container);
         add_pic = (ImageView) findViewById(R.id.add_picture);
         btn_commit = (Button) findViewById(R.id.btn_commit);
 
-        if(PIC_SELECTED == 0) {
+        if (PIC_SELECTED == 0) {
             add_pic.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -79,12 +78,8 @@ public class PostMessage extends AppCompatActivity {
                                     startActivityForResult(camera, TAKE_PHOTO);
                                     break;
                                 case 1:
-                                    //Intent picture = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                                     Intent picture = new Intent(Intent.ACTION_GET_CONTENT);
-                                    picture.addCategory(Intent.CATEGORY_OPENABLE);
                                     picture.setType("image/*");
-                                    picture.putExtra("return-data", true);
-                                    //picture.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                                     startActivityForResult(picture, BROWSE_PHOTO);
                                     break;
                             }
@@ -93,7 +88,7 @@ public class PostMessage extends AppCompatActivity {
                     builder.show();
                 }
             });
-        }else {
+        } else {
             add_pic.setOnClickListener(new View.OnClickListener() { // 点击放大
                 public void onClick(View paramView) {
                     LayoutInflater inflater = LayoutInflater.from(PostMessage.this);
@@ -129,22 +124,9 @@ public class PostMessage extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case TAKE_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    try {
-                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-                        add_pic.setImageBitmap(bitmap);
-                        PIC_SELECTED = PIC_SELECTED + 1;
-                        System.out.println(PIC_SELECTED);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            case BROWSE_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    //Bitmap bitmap = null;
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case TAKE_PHOTO:
                     try {
                         bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
                         add_pic.setImageBitmap(bitmap);
@@ -152,8 +134,20 @@ public class PostMessage extends AppCompatActivity {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                }
-                break;
+                    break;
+                case BROWSE_PHOTO:
+                    //外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
+                    ContentResolver resolver = getContentResolver();
+                    try {
+                        Uri uri = data.getData();        //获得图片的uri
+                        bitmap = MediaStore.Images.Media.getBitmap(resolver, uri);
+                        add_pic.setImageBitmap(bitmap);
+                        PIC_SELECTED = PIC_SELECTED + 1;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
         }
     }
 

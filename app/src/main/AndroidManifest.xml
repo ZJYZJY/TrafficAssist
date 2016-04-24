@@ -52,6 +52,9 @@
         <activity
             android:name=".ui.SignupActivity"
             android:label="@string/label_register" />
+        <activity
+            android:name=".ui.AlarmHistory"
+            android:label="@string/label_alarm_history"/>
     </application>
 
 </manifest>

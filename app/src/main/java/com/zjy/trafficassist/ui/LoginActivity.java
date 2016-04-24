@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +36,7 @@ import android.widget.Toast;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.User;
+import com.zjy.trafficassist.WebService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
+    public static boolean login_status;
     private UserLoginTask mAuthTask;
     private User user = new User();
     private DatabaseManager DBManager;
@@ -103,6 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mSignup.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             }
         });
@@ -113,7 +115,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mForgetpassword.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("数据库有" + DBManager.getCount() + "条数据");
+                Toast.makeText(LoginActivity.this, "数据库有" + DBManager.getUserCount() + "条数据", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -132,6 +134,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         DBManager = new DatabaseManager(this);
+        login_status = false;
     }
 
     private void populateAutoComplete() {
@@ -221,11 +224,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
-            System.out.println("cancel");
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            System.out.println("attemptLogin");
             showProgress(true);
             mAuthTask = new UserLoginTask();
             mAuthTask.execute();
@@ -339,13 +340,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-//        private final String mUsername;
-//        private final String mPassword;
-
-//        UserLoginTask(String username, String password) {
-//            mUsername = username;
-//            mPassword = password;
-//        }
+        private String ReturnCode;
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -354,11 +349,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
-                Log.d("msg", "sleep");
             } catch (InterruptedException e) {
                 return false;
             }
-            return DBManager.Login(user);
+            ReturnCode = WebService.Login_Register(user.getUsername(), user.getPassword(), WebService.LOGIN);
+            return Boolean.parseBoolean(ReturnCode);
+            //return DBManager.Login(user);
         }
 
         @Override
@@ -367,10 +363,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
+                login_status = true;
                 finish();
             } else {
-                Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
