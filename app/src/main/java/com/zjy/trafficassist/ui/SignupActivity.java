@@ -21,7 +21,7 @@ import com.zjy.trafficassist.WebService;
 public class SignupActivity extends AppCompatActivity {
 
     private DatabaseManager DBManager;
-    private User user = new User();
+    private User user;
 
     private CoordinatorLayout container;
     private EditText new_username;
@@ -54,8 +54,10 @@ public class SignupActivity extends AppCompatActivity {
 
     private void attemptSignUp(){
 
-        user.setUsername(new_username.getText().toString());
-        user.setPassword(new_passname.getText().toString());
+        /**
+         * 初始化User对象
+         */
+        user = new User(new_username.getText().toString(), new_passname.getText().toString());
 
         boolean cancel = false;
         View focusView = null;
@@ -97,10 +99,10 @@ public class SignupActivity extends AppCompatActivity {
                 protected void onPostExecute(final Boolean success) {
                     super.onPostExecute(success);
                     if (success) {
-                        Toast.makeText(SignupActivity.this, "登陆成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignupActivity.this, "注册成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
                         finish();
                     } else {
-                        Toast.makeText(SignupActivity.this, "登陆失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignupActivity.this, "注册失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
                     }
                 }
             }.execute();

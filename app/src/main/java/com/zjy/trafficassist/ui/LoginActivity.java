@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public static boolean login_status;
     private UserLoginTask mAuthTask;
-    private User user = new User();
+    private User user;
     private DatabaseManager DBManager;
 
     // UI references.
@@ -195,9 +195,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mUsernameView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
-        user.setUsername(mUsernameView.getText().toString());
-        user.setPassword(mPasswordView.getText().toString());
+        /**
+         * 初始化User对象
+         */
+        user = new User(mUsernameView.getText().toString(), mPasswordView.getText().toString());
 
         boolean cancel = false;
         View focusView = null;
@@ -365,6 +366,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success) {
                 Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
                 login_status = true;
+                Intent i = new Intent();
+                i.putExtra("user", user);
+                setResult(1 ,i);
                 finish();
             } else {
                 Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
