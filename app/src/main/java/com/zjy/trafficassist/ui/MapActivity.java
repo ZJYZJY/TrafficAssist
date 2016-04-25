@@ -18,6 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -31,10 +33,13 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.LatLng;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.User;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LocationSource, AMapLocationListener, View.OnClickListener {
+
+    public static final int LOGIN_STUFF = 0;
 
     private MapView mapView;
     private AMap aMap;
@@ -48,8 +53,12 @@ public class MapActivity extends AppCompatActivity
     private Button login;
     private NavigationView navigationView;
     private DrawerLayout drawer;
+    private LinearLayout unlogin, logined;
+    private ImageView display_user_pic;
+    private Button display_user_name;
 
     private boolean first_show;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +72,10 @@ public class MapActivity extends AppCompatActivity
         fab_post = (FloatingActionButton) findViewById(R.id.fab_post);
         View headerView = navigationView.getHeaderView(0);
         login = (Button) headerView.findViewById(R.id.login_map_aty);
+        unlogin = (LinearLayout) headerView.findViewById(R.id.unlogin);
+        logined = (LinearLayout) headerView.findViewById(R.id.logined);
+        display_user_pic = (ImageView) headerView.findViewById(R.id.display_user_pic);
+        display_user_name = (Button) headerView.findViewById(R.id.display_user_name);
 
         fab_post.setOnClickListener(this);
         login.setOnClickListener(this);
@@ -242,6 +255,33 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onClick(View v) {
+        //主界面按钮监听事件
+        switch (v.getId()) {
+            case R.id.fab_post:
+                startActivity(new Intent(MapActivity.this, PostMessage.class));
+                break;
+            case R.id.login_map_aty:
+                //startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                startActivityForResult(new Intent(MapActivity.this, LoginActivity.class), LOGIN_STUFF);
+                break;
+        }
+        drawer.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case LOGIN_STUFF:
+                if (resultCode == 1) {
+                    user = data.getParcelableExtra("user");
+                }
+                break;
+        }
+    }
+
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 按下键盘上返回按钮出现提示窗口
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -267,29 +307,18 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        //主界面按钮监听事件
-        switch (v.getId()) {
-            case R.id.fab_post:
-                startActivity(new Intent(MapActivity.this, PostMessage.class));
-                break;
-            case R.id.login_map_aty:
-                startActivity(new Intent(MapActivity.this, LoginActivity.class));
-                break;
-        }
-        drawer.closeDrawer(GravityCompat.START);
-    }
-
     //MapView生命周期
     @Override
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if(LoginActivity.login_status && first_show) {
+        if (LoginActivity.login_status && first_show) {
             Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
+            display_user_name.setText(user.getUsername());
             first_show = false;
         }
+        logined.setVisibility(LoginActivity.login_status ? View.VISIBLE : View.GONE);
+        unlogin.setVisibility(LoginActivity.login_status ? View.GONE : View.VISIBLE);
     }
 
     @Override

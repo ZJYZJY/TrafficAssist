@@ -85,6 +85,10 @@ public class WebService {
         }
         return null;
     }
+
+    public static void Test() {
+
+    }
 //    /**
 //     * 将输入流转化为 String 型
 //     */
