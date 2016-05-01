@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.User;
@@ -46,7 +47,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -63,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    public static boolean login_status;
     private UserLoginTask mAuthTask;
     private User user;
     private DatabaseManager DBManager;
@@ -134,7 +134,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         DBManager = new DatabaseManager(this);
-        login_status = false;
+        MapActivity.login_status = false;
     }
 
     private void populateAutoComplete() {
@@ -336,8 +336,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * 后台线程进行登陆操作
+     * @ReturnCode String "true" or "false"
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -353,7 +353,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (InterruptedException e) {
                 return false;
             }
-            ReturnCode = WebService.Login_Register(user.getUsername(), user.getPassword(), WebService.LOGIN);
+            ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
             return Boolean.parseBoolean(ReturnCode);
             //return DBManager.Login(user);
         }
@@ -364,8 +364,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
-                login_status = true;
+                MapActivity.login_status = true;
                 Intent i = new Intent();
                 i.putExtra("user", user);
                 setResult(1 ,i);

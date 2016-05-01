@@ -3,4 +3,6 @@
     <color name="colorPrimary">#383838</color>
     <color name="colorPrimaryDark">#2e2e2e</color>
     <color name="colorAccent">#3aa699</color>
+
+    <color name="fadePanel">#252525</color>
 </resources>

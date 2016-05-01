@@ -1,8 +1,10 @@
 package com.zjy.trafficassist.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,12 +15,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.User;
 import com.zjy.trafficassist.WebService;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends BaseActivity {
 
     private DatabaseManager DBManager;
     private User user;
@@ -58,6 +61,7 @@ public class SignupActivity extends AppCompatActivity {
          * 初始化User对象
          */
         user = new User(new_username.getText().toString(), new_passname.getText().toString());
+        MapActivity.user = user;
 
         boolean cancel = false;
         View focusView = null;
@@ -86,20 +90,27 @@ public class SignupActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             // perform the user login attempt.
+            final ProgressDialog mPDialog = new ProgressDialog(SignupActivity.this);
+            mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mPDialog.setMessage(getResources().getString(R.string.register_new_user));
+            mPDialog.setCancelable(true);
+            mPDialog.show();
             new AsyncTask<Void, Void, Boolean>(){
                 String ReturnCode;
 
                 @Override
                 protected Boolean doInBackground(Void... params) {
-                    ReturnCode = WebService.Login_Register(user.getUsername(), user.getPassword(), WebService.REGISTER);
+                    ReturnCode = WebService.Register(user.getUsername(), user.getPassword());
                     return Boolean.parseBoolean(ReturnCode);
                 }
 
                 @Override
                 protected void onPostExecute(final Boolean success) {
                     super.onPostExecute(success);
+                    mPDialog.dismiss();
                     if (success) {
                         Toast.makeText(SignupActivity.this, "注册成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                        MapActivity.login_status = true;
                         finish();
                     } else {
                         Toast.makeText(SignupActivity.this, "注册失败：" + ReturnCode, Toast.LENGTH_SHORT).show();

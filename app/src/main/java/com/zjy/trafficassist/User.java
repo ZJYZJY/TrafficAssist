@@ -10,10 +10,12 @@ public class User implements Parcelable {
 
     private String username;
     private String password;
+    private String nickname;
 
     protected User(Parcel in) {
         username = in.readString();
         password = in.readString();
+        nickname = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -37,6 +39,7 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(getUsername());
         dest.writeString(getPassword());
+        dest.writeString(getNickname());
     }
 
     public User(String username, String password) {
@@ -52,11 +55,19 @@ public class User implements Parcelable {
         return password;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

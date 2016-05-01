@@ -2,6 +2,7 @@ package com.zjy.trafficassist;
 
 /**
  * Created by ZJY on 2016/4/20.
+ * 报警记录信息
  */
 public class AlarmHistory {
 
@@ -9,12 +10,17 @@ public class AlarmHistory {
     private String username;
     private String detail;
     private boolean isSerious;
+    private String serious;
 
-    public AlarmHistory(int id, boolean isSerious, String detail, String username) {
-        this.id = id;
+    public AlarmHistory(boolean isSerious, String detail, String username) {
         this.isSerious = isSerious;
         this.detail = detail;
         this.username = username;
+        if(isSerious) {
+            serious = "true";
+        } else {
+            serious = "false";
+        }
     }
 
     public void setSerious(boolean serious) {

@@ -1,8 +1,10 @@
 package com.zjy.trafficassist.ui;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,21 +18,28 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.*;
+import com.zjy.trafficassist.AlarmHistory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class PostMessage extends AppCompatActivity {
+public class PostMessage extends BaseActivity {
 
     public static final int TAKE_PHOTO = 0;
     public static final int BROWSE_PHOTO = 1;
     private int PIC_SELECTED = 0;
+
+    private EditText accident_edit;
+    private CheckBox isSerious;
     private ImageView add_pic;
     private Button btn_commit;
     private Uri imageUri;
@@ -38,21 +47,24 @@ public class PostMessage extends AppCompatActivity {
     //Snackbar的容器
     private CoordinatorLayout container;
 
+    private AlarmHistory mHistory;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_post_message);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        accident_edit = (EditText) findViewById(R.id.accident_edit);
+        isSerious = (CheckBox) findViewById(R.id.isSerious);
         container = (CoordinatorLayout) findViewById(R.id.post_container);
         add_pic = (ImageView) findViewById(R.id.add_picture);
         btn_commit = (Button) findViewById(R.id.btn_commit);
 
-        if (PIC_SELECTED == 0) {
-            add_pic.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        add_pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (PIC_SELECTED == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(PostMessage.this);
                     final String[] ways = {"拍照", "从手机相册中选择"};
                     //    设置一个下拉的列表选择项
@@ -86,11 +98,7 @@ public class PostMessage extends AppCompatActivity {
                         }
                     });
                     builder.show();
-                }
-            });
-        } else {
-            add_pic.setOnClickListener(new View.OnClickListener() { // 点击放大
-                public void onClick(View paramView) {
+                } else {
                     LayoutInflater inflater = LayoutInflater.from(PostMessage.this);
                     View imgEntryView = inflater.inflate(R.layout.large_image, null); // 加载自定义的布局文件
                     final AlertDialog dialog = new AlertDialog.Builder(PostMessage.this).create();
@@ -105,18 +113,49 @@ public class PostMessage extends AppCompatActivity {
                         }
                     });
                 }
-            });
-        }
+            }
+        });
 
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(container, "正在提交报案信息中...", Snackbar.LENGTH_LONG).setAction("取消", new View.OnClickListener() {
+//                Snackbar.make(container, "正在提交报案信息中...", Snackbar.LENGTH_LONG).setAction("取消", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Snackbar.make(container, "取消成功", Snackbar.LENGTH_LONG).show();
+//                    }
+//                }).show();
+
+                //mHistory = new AlarmHistory(isSerious.isChecked(), accident_edit.getText().toString(), MapActivity.user.getUsername());
+                mHistory = new AlarmHistory(isSerious.isChecked(), accident_edit.getText().toString(), "郑家烨");
+
+                final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
+                mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                mPDialog.setMessage(getResources().getString(R.string.uploading_history));
+                mPDialog.setCancelable(true);
+                mPDialog.show();
+                new AsyncTask<Void, Void, Boolean>() {
+
+                    String ReturnCode;
                     @Override
-                    public void onClick(View v) {
-                        Snackbar.make(container, "取消成功", Snackbar.LENGTH_LONG).show();
+                    protected Boolean doInBackground(Void... params) {
+                        ReturnCode = WebService.UploadHistory(mHistory);
+                        return Boolean.parseBoolean(ReturnCode);
                     }
-                }).show();
+
+                    @Override
+                    protected void onPostExecute(final Boolean success) {
+                        super.onPostExecute(success);
+                        mPDialog.dismiss();
+                        if (success) {
+                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
+                            Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
+                            Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }.execute();
             }
         });
     }

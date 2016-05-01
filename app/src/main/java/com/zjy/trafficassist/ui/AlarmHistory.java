@@ -7,12 +7,13 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.HistoryListAdapter;
 import com.zjy.trafficassist.R;
 
 import java.util.ArrayList;
 
-public class AlarmHistory extends AppCompatActivity {
+public class AlarmHistory extends BaseActivity {
 
 
     private static boolean FROM_INTERNET = false;
@@ -60,15 +61,15 @@ public class AlarmHistory extends AppCompatActivity {
         if (FROM_INTERNET) {
 
         }
-        com.zjy.trafficassist.AlarmHistory history_item1 = new com.zjy.trafficassist.AlarmHistory(1, true, "车辆侧面发生刮擦", "郑家烨");
-        com.zjy.trafficassist.AlarmHistory history_item2 = new com.zjy.trafficassist.AlarmHistory(2, false, "detail", "赵晨曦");
-        com.zjy.trafficassist.AlarmHistory history_item3 = new com.zjy.trafficassist.AlarmHistory(3, false, "detail", "孙洪萍");
-        com.zjy.trafficassist.AlarmHistory history_item4 = new com.zjy.trafficassist.AlarmHistory(4, false, "detail", "郝琰");
-        com.zjy.trafficassist.AlarmHistory history_item5 = new com.zjy.trafficassist.AlarmHistory(5, false, "detail", "用户甲");
-        com.zjy.trafficassist.AlarmHistory history_item6 = new com.zjy.trafficassist.AlarmHistory(6, false, "detail", "用户乙");
-        com.zjy.trafficassist.AlarmHistory history_item7 = new com.zjy.trafficassist.AlarmHistory(7, false, "detail", "用户丙");
-        com.zjy.trafficassist.AlarmHistory history_item8 = new com.zjy.trafficassist.AlarmHistory(8, false, "detail", "用户丁");
-        com.zjy.trafficassist.AlarmHistory history_item9 = new com.zjy.trafficassist.AlarmHistory(9, false, "detail", "用户A");
+        com.zjy.trafficassist.AlarmHistory history_item1 = new com.zjy.trafficassist.AlarmHistory(true, "车辆侧面发生刮擦", "郑家烨");
+        com.zjy.trafficassist.AlarmHistory history_item2 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "赵晨曦");
+        com.zjy.trafficassist.AlarmHistory history_item3 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "孙洪萍");
+        com.zjy.trafficassist.AlarmHistory history_item4 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "郝琰");
+        com.zjy.trafficassist.AlarmHistory history_item5 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "用户甲");
+        com.zjy.trafficassist.AlarmHistory history_item6 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "用户乙");
+        com.zjy.trafficassist.AlarmHistory history_item7 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "用户丙");
+        com.zjy.trafficassist.AlarmHistory history_item8 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "用户丁");
+        com.zjy.trafficassist.AlarmHistory history_item9 = new com.zjy.trafficassist.AlarmHistory(false, "detail", "用户A");
         listItems.add(history_item1);
         listItems.add(history_item2);
         listItems.add(history_item3);

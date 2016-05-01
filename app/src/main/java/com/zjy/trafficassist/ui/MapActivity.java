@@ -58,7 +58,8 @@ public class MapActivity extends AppCompatActivity
     private Button display_user_name;
 
     private boolean first_show;
-    private User user;
+    public static boolean login_status;
+    public static User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -312,13 +313,13 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if (LoginActivity.login_status && first_show) {
+        if (login_status && first_show) {
             Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
             display_user_name.setText(user.getUsername());
             first_show = false;
         }
-        logined.setVisibility(LoginActivity.login_status ? View.VISIBLE : View.GONE);
-        unlogin.setVisibility(LoginActivity.login_status ? View.GONE : View.VISIBLE);
+        logined.setVisibility(login_status ? View.VISIBLE : View.GONE);
+        unlogin.setVisibility(login_status ? View.GONE : View.VISIBLE);
     }
 
     @Override
