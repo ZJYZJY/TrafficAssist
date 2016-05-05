@@ -73,7 +73,9 @@ public class PostMessage extends BaseActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             Toast.makeText(PostMessage.this, "选择为：" + ways[which], Toast.LENGTH_SHORT).show();
                             //创建File对象，用于存储照片
-                            File image = new File(Environment.getExternalStorageDirectory(), "1.jpg");
+//                            File image = new File(Environment.getExternalStorageDirectory()
+//                                        + File.separator + Environment.DIRECTORY_DCIM, "1.jpg");
+                            File image = new File(Environment.getExternalStorageDirectory(), "/DICM/Camera/1.jpg");
                             try {
                                 if (image.exists()) {
                                     image.delete();
@@ -119,19 +121,13 @@ public class PostMessage extends BaseActivity {
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Snackbar.make(container, "正在提交报案信息中...", Snackbar.LENGTH_LONG).setAction("取消", new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Snackbar.make(container, "取消成功", Snackbar.LENGTH_LONG).show();
-//                    }
-//                }).show();
 
-                //mHistory = new AlarmHistory(isSerious.isChecked(), accident_edit.getText().toString(), MapActivity.user.getUsername());
-                mHistory = new AlarmHistory(isSerious.isChecked(), accident_edit.getText().toString(), "郑家烨");
+                mHistory = new AlarmHistory(isSerious.isChecked(),
+                        accident_edit.getText().toString(), UserStatus.user.getNickname());
 
                 final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
                 mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                mPDialog.setMessage(getResources().getString(R.string.uploading_history));
+                mPDialog.setMessage(getResources().getString(R.string.now_upload_history));
                 mPDialog.setCancelable(true);
                 mPDialog.show();
                 new AsyncTask<Void, Void, Boolean>() {
@@ -148,10 +144,10 @@ public class PostMessage extends BaseActivity {
                         super.onPostExecute(success);
                         mPDialog.dismiss();
                         if (success) {
-                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
                             Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
                             Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
                         }
                     }
@@ -180,9 +176,15 @@ public class PostMessage extends BaseActivity {
                     try {
                         Uri uri = data.getData();        //获得图片的uri
                         bitmap = MediaStore.Images.Media.getBitmap(resolver, uri);
+//                        BitmapFactory.Options options = new BitmapFactory.Options();
+//                        options.inTempStorage = new byte[1024 * 1024 * 2];
+//                        options.inSampleSize = 2;
+//                        Bitmap bitmap = BitmapFactory.decodeFile
+//                                (Environment.getExternalStorageDirectory() + File.separator
+//                                        + Environment.DIRECTORY_DCIM, options);
                         add_pic.setImageBitmap(bitmap);
                         PIC_SELECTED = PIC_SELECTED + 1;
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;

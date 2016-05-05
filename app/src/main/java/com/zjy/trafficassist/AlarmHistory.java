@@ -12,6 +12,17 @@ public class AlarmHistory {
     private boolean isSerious;
     private String serious;
 
+//    public AlarmHistory(AlarmHistory alarmHistory) {
+//        this.isSerious = alarmHistory.isSerious();
+//        this.detail = alarmHistory.getDetail();
+//        this.username = alarmHistory.getUsername();
+//        if(isSerious) {
+//            serious = "true";
+//        } else {
+//            serious = "false";
+//        }
+//    }
+
     public AlarmHistory(boolean isSerious, String detail, String username) {
         this.isSerious = isSerious;
         this.detail = detail;

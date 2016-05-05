@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created on 2016/4/20.
+ *
  * @author 郑家烨.
  */
 public class WebService {
@@ -18,6 +21,7 @@ public class WebService {
      */
     private static String path;
     private static String server_IP = "192.168.199.223:8080";
+//    private static String server_IP = "192.168.253.7:8080";
 
     /**
      * 与HTTP服务器通信，进行登录
@@ -47,6 +51,67 @@ public class WebService {
 //        history.put("nickname", alarmHistory.getUsername());
 //        history.put("detail", alarmHistory.getDetail());
         return Connect();
+    }
+
+    /**
+     * 与HTTP服务器通信，获取报警信息到本地
+     */
+    public static String DownloadHistory() {
+        path = "http://" + server_IP + "/TrafficAssistSever/DownloadHistory";
+        path = path + "?username=" + UserStatus.user.getUsername();
+        return Connect();
+//        HttpURLConnection conn = null;
+//        InputStream is = null;
+//        InputStreamReader isr;
+//        BufferedReader br;
+//        try {
+//            conn = (HttpURLConnection) new URL(path).openConnection();
+//
+//            conn.setConnectTimeout(5000); // 设置超时时间
+//            conn.setReadTimeout(5000);
+//            conn.setDoInput(true);
+//            conn.setDoOutput(true);
+//            conn.setRequestMethod("POST"); // 设置获取信息方式
+//            conn.setRequestProperty("Charset", "UTF-8"); // 设置接收数据编码格式
+//
+//            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+//                is = conn.getInputStream();
+//                isr = new InputStreamReader(is);
+//                br = new BufferedReader(isr);
+//                StringBuffer line;
+//                ArrayList<String> detail = new ArrayList<> ();
+//                while (br.readLine() != null) {
+//                    line = new StringBuffer(br.readLine());
+//                    int last = 0;
+//                    for(int i = 0; i < line.length(); i++) {
+//                        if(line.charAt(i) == ' ') {     //返回数据的每一个空格表示一条detail的结束
+//                            detail.add(line.substring(last, i));
+//                            last = i + 1;
+//                        }
+//                    }
+//                }
+//                br.close();
+//                isr.close();
+//                is.close();
+//                return detail;
+//                //return parseInfo(is);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            // 意外退出时进行连接关闭保护
+//            if (conn != null) {
+//                conn.disconnect();
+//            }
+//            if (is != null) {
+//                try {
+//                    is.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        return null;
     }
 
     private static String Connect() {
