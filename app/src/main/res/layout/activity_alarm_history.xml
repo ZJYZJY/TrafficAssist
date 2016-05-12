@@ -3,13 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
     android:background="#e1e1e1"
     tools:context="com.zjy.trafficassist.ui.AlarmHistory"
     android:id="@+id/refreshLayout">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/historyList"
         android:dividerHeight="10dp"
         android:divider="#e1e1e1"

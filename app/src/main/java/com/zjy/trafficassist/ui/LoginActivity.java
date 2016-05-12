@@ -34,7 +34,7 @@ import android.widget.Toast;
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.User;
+import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.WebService;
 

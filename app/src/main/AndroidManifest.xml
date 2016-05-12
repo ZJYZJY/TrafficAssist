@@ -46,19 +46,21 @@
         <activity
             android:name=".ui.PostMessage"
             android:label="编辑事故详情"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"/>
+            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/label_login"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"/>
+            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
         <activity
             android:name=".ui.SignupActivity"
             android:label="@string/label_register"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"/>
+            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
         <activity
             android:name=".ui.AlarmHistory"
             android:label="@string/label_alarm_history"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"/>
+            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+        <activity android:name=".ui.DetailedInfo" />
+        <activity android:name=".ui.UserInfo"></activity>
     </application>
 
 </manifest>

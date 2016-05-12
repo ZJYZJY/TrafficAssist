@@ -1,5 +1,7 @@
 package com.zjy.trafficassist;
 
+import com.zjy.trafficassist.model.AlarmHistory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +20,18 @@ public class JSONParser {
         if (json == null)
             return null;
         ArrayList<AlarmHistory> alarmHistories = new ArrayList<>();
+//        ArrayList<byte[]> pictures = new ArrayList<>();
+        byte[] pic;
         JSONObject historyInfo = new JSONObject(json);
-        JSONArray details = historyInfo.getJSONArray("allDetails");
-        for (int i = 0; i < details.length(); i++) {
-            JSONObject detail = (JSONObject) details.get(i);
+
+        JSONArray histories = historyInfo.getJSONArray("allDetails");
+        for (int i = 0; i < histories.length(); i++) {
+            JSONObject detail = (JSONObject) histories.get(i);
             String str_detail = (String) detail.get("detail");
-            alarmHistories.add(new AlarmHistory(true, str_detail, UserStatus.user.getNickname()));
+            String str_pic = (String) detail.get("picture");
+//            pictures.add(str_pic.getBytes());
+            alarmHistories.add(new AlarmHistory(true, str_detail,
+                    UserStatus.user.getNickname(), UserStatus.user.getUsername(), str_pic.getBytes()));
         }
         return alarmHistories;
     }

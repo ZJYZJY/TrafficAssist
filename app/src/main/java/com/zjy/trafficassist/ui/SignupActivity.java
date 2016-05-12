@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +16,7 @@ import android.widget.Toast;
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.User;
+import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.WebService;
 

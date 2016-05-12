@@ -1,40 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp"
-    android:background="@drawable/history_item"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginBottom="8dp"
+    android:orientation="vertical"
+    card_view:cardBackgroundColor="@color/cardview_shadow_end_color">
 
-    <TextView
-        android:id="@+id/text_id"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
-        android:text="ID：null" />
+        android:layout_height="match_parent"
+        android:padding="8dp">
 
-    <TextView
-        android:id="@+id/text_username"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text_id"
-        android:paddingLeft="5dp"
-        android:text="姓名：null" />
+        <TextView
+            android:id="@+id/text_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:text="ID：null" />
 
-    <TextView
-        android:id="@+id/text_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text_username"
-        android:paddingLeft="5dp"
-        android:text="详情：null" />
+        <TextView
+            android:id="@+id/text_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_id"
+            android:paddingLeft="5dp"
+            android:text="姓名：null" />
 
-    <TextView
-        android:id="@+id/text_isSerious"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text_detail"
-        android:paddingLeft="5dp"
-        android:text="null" />
+        <TextView
+            android:id="@+id/text_detail"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/text_username"
+            android:paddingLeft="5dp"
+            android:text="详情：null" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/text_isSerious"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_detail"
+            android:paddingLeft="5dp"
+            android:text="null" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

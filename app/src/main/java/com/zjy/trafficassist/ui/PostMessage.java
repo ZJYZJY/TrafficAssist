@@ -9,7 +9,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -26,11 +24,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
-import com.zjy.trafficassist.AlarmHistory;
+import com.zjy.trafficassist.model.AlarmHistory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class PostMessage extends BaseActivity {
 
@@ -48,6 +48,8 @@ public class PostMessage extends BaseActivity {
     private CoordinatorLayout container;
 
     private AlarmHistory mHistory;
+    private ArrayList<byte[]> picture = new ArrayList<>();
+    private byte[] pic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +125,8 @@ public class PostMessage extends BaseActivity {
             public void onClick(View v) {
 
                 mHistory = new AlarmHistory(isSerious.isChecked(),
-                        accident_edit.getText().toString(), UserStatus.user.getNickname());
+                        accident_edit.getText().toString(), UserStatus.user.getNickname(),
+                        UserStatus.user.getUsername(), pic);
 
                 final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
                 mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -144,10 +147,8 @@ public class PostMessage extends BaseActivity {
                         super.onPostExecute(success);
                         mPDialog.dismiss();
                         if (success) {
-//                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
                             Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
                         } else {
-//                            Toast.makeText(PostMessage.this, ReturnCode, Toast.LENGTH_SHORT).show();
                             Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
                         }
                     }
@@ -164,6 +165,7 @@ public class PostMessage extends BaseActivity {
                 case TAKE_PHOTO:
                     try {
                         bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        pic = getImageByte(bitmap);
                         add_pic.setImageBitmap(bitmap);
                         PIC_SELECTED = PIC_SELECTED + 1;
                     } catch (FileNotFoundException e) {
@@ -174,14 +176,10 @@ public class PostMessage extends BaseActivity {
                     //外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
                     ContentResolver resolver = getContentResolver();
                     try {
-                        Uri uri = data.getData();        //获得图片的uri
+                        //获得图片的uri
+                        Uri uri = data.getData();
                         bitmap = MediaStore.Images.Media.getBitmap(resolver, uri);
-//                        BitmapFactory.Options options = new BitmapFactory.Options();
-//                        options.inTempStorage = new byte[1024 * 1024 * 2];
-//                        options.inSampleSize = 2;
-//                        Bitmap bitmap = BitmapFactory.decodeFile
-//                                (Environment.getExternalStorageDirectory() + File.separator
-//                                        + Environment.DIRECTORY_DCIM, options);
+                        pic = getImageByte(bitmap);
                         add_pic.setImageBitmap(bitmap);
                         PIC_SELECTED = PIC_SELECTED + 1;
                     } catch (Exception e) {
@@ -190,6 +188,12 @@ public class PostMessage extends BaseActivity {
                     break;
             }
         }
+    }
+
+    private byte[] getImageByte(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
     }
 
     @Override

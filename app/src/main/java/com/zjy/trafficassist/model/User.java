@@ -1,4 +1,4 @@
-package com.zjy.trafficassist;
+package com.zjy.trafficassist.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

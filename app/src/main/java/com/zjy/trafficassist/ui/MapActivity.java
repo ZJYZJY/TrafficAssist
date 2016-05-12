@@ -28,12 +28,10 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
-import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
-import com.amap.api.maps.model.LatLng;
+import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.User;
 import com.zjy.trafficassist.UserStatus;
 
 public class MapActivity extends AppCompatActivity
@@ -56,7 +54,6 @@ public class MapActivity extends AppCompatActivity
     private ImageView display_user_pic;
     private Button display_user_name;
 
-    private boolean first_show;
     private long exitTime = 0;
 
     @Override
@@ -65,7 +62,6 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        first_show = true;
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         fab_post = (FloatingActionButton) findViewById(R.id.fab_post);
@@ -267,7 +263,8 @@ public class MapActivity extends AppCompatActivity
         } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_about) {
-
+//            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
+//                    + "条数据", Toast.LENGTH_SHORT).show();
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -308,10 +305,10 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if (UserStatus.Login_status && first_show) {
+        if (UserStatus.Login_status && UserStatus.first_show) {
             Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
             display_user_name.setText(UserStatus.user.getUsername());
-            first_show = false;
+            UserStatus.first_show = false;
         }
         logined.setVisibility(UserStatus.Login_status ? View.VISIBLE : View.GONE);
         unlogin.setVisibility(UserStatus.Login_status ? View.GONE : View.VISIBLE);
