@@ -7,7 +7,7 @@
             <!--四个角都是圆的-->
             <corners android:radius="8px"/>
             <stroke
-                android:color="#3aa699"
+                android:color="#a7a7a7"
                 android:width="5px" />
         </shape>
     </item>

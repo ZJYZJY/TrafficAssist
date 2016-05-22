@@ -1,5 +1,7 @@
 package com.zjy.trafficassist.ui;
 
+import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -8,23 +10,25 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.adapter.HistoryListAdapter;
-import com.zjy.trafficassist.JSONParser;
+import com.zjy.trafficassist.TransForm;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.WebService;
 
 import org.json.JSONException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class AlarmHistory extends BaseActivity {
 
 
-    private static boolean FROM_INTERNET = true;
+    private static boolean FROM_INTERNET;
 
     private RecyclerView historyList;
     private ArrayList<com.zjy.trafficassist.model.AlarmHistory> local_history;
@@ -42,12 +46,19 @@ public class AlarmHistory extends BaseActivity {
 
         databaseManager = new DatabaseManager(this);
         RefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
+        if (RefreshLayout != null) {
+            RefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
+                    android.R.color.holo_red_light,
+                    android.R.color.holo_orange_light,
+                    android.R.color.holo_green_light);
+        }
         historyList = (RecyclerView) findViewById(R.id.historyList);
         historyList.setLayoutManager(new LinearLayoutManager(this));    //设置LinearLayoutManager
         historyList.setItemAnimator(new DefaultItemAnimator());         //设置ItemAnimator
         historyList.setHasFixedSize(true);                              //设置固定大小
 
         FROM_INTERNET = true;
+//        internet_history = new ArrayList<>();
         internet_history = getListItem();
 //        local_history = getListItem();
         /**
@@ -55,9 +66,7 @@ public class AlarmHistory extends BaseActivity {
          */
 //        historyListAdapter = new HistoryListAdapter(this, local_history);
         historyListAdapter = new HistoryListAdapter(this, internet_history);
-//        historyListAdapter = new HistoryListAdapter(this, databaseManager.LoadHistory());
         historyList.setAdapter(historyListAdapter);
-//        databaseManager.SaveHistory(internet_history);
 
         RefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -69,9 +78,8 @@ public class AlarmHistory extends BaseActivity {
                         FROM_INTERNET = true;
                         internet_history = getListItem();
                         RefreshLayout.setRefreshing(false);
-                        historyListAdapter.notifyDataSetChanged();
                     }
-                }, 2000);
+                }, 10000);
             }
         });
     }
@@ -81,6 +89,11 @@ public class AlarmHistory extends BaseActivity {
         final ArrayList<com.zjy.trafficassist.model.AlarmHistory> history_item = new ArrayList<>();
 
         if (FROM_INTERNET) {
+            final ProgressDialog mPDialog = new ProgressDialog(AlarmHistory.this);
+            mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mPDialog.setMessage(getResources().getString(R.string.now_loading));
+            mPDialog.setCancelable(true);
+            mPDialog.show();
             new AsyncTask<Void, Void, ArrayList<com.zjy.trafficassist.model.AlarmHistory>>() {
 
                 @Override
@@ -88,8 +101,8 @@ public class AlarmHistory extends BaseActivity {
 
                     String history_list = WebService.DownloadHistory();
                     try {
-                        return JSONParser.DownloadHistory(history_list);
-                    } catch (JSONException e) {
+                        return TransForm.DownloadHistory(history_list);
+                    } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
                     return null;
@@ -102,9 +115,13 @@ public class AlarmHistory extends BaseActivity {
                         for (int i = 0; i < ReturnCode.size(); i++) {
                             history_item.add(ReturnCode.get(i));
                         }
+//                        mPDialog.dismiss();
+                        historyListAdapter.notifyDataSetChanged();
                     } else {
+//                        mPDialog.dismiss();
                         Toast.makeText(AlarmHistory.this, "没有历史记录", Toast.LENGTH_SHORT).show();
                     }
+                    mPDialog.dismiss();
                 }
             }.execute();
         }

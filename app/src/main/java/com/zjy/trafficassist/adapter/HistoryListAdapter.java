@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zjy.trafficassist.R;
@@ -41,6 +42,8 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             holder.text_isSerious.setText("严重？：YES");
         else
             holder.text_isSerious.setText("严重？：No");
+        if(alarmHistories.get(position).getPicture() != null)
+            holder.his_pic.setImageBitmap(alarmHistories.get(position).getPicture());
     }
 
     @Override
@@ -59,6 +62,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         public TextView text_username;
         public TextView text_detail;
         public TextView text_isSerious;
+        public ImageView his_pic;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -66,6 +70,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             text_username = (TextView) itemView.findViewById(R.id.text_username);
             text_detail = (TextView) itemView.findViewById(R.id.text_detail);
             text_isSerious = (TextView) itemView.findViewById(R.id.text_isSerious);
+            his_pic = (ImageView) itemView.findViewById(R.id.his_pic);
         }
     }
 }

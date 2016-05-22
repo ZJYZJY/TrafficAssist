@@ -5,7 +5,7 @@
         <shape>
             <solid android:color="@color/colorAccent" />
             <!--四个角都是圆的-->
-            <corners android:radius="10px"/>
+            <corners android:radius="20px"/>
         </shape>
     </item>
 </layer-list>

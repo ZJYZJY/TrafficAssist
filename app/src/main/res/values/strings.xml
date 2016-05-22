@@ -25,6 +25,8 @@
     <string name="action_sign_up"><u>注册用户</u></string>
     <string name="action_forget_password"><u>忘记密码</u></string>
     <string name="label_alarm_history">历史报警记录</string>
+
+    <string name="now_loading">正在载入中…</string>
     <string name="now_upload_history">正在上传中…</string>
     <string name="now_user_login">正在登录…</string>
     <string name="now_user_register">注册中…</string>

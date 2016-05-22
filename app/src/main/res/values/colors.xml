@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#383838</color>
-    <color name="colorPrimaryDark">#2e2e2e</color>
-    <color name="colorAccent">#3aa699</color>
+    <!--<color name="colorPrimary">#383838</color>-->
+    <color name="colorPrimary">#1e75ba</color>
+    <color name="colorPrimaryDark">#1e75ba</color>
+    <color name="colorAccent">#1e75ba</color>
 
-    <color name="fadePanel">#252525</color>
+    <color name="fadePanel">#2e2e2e</color>
 </resources>

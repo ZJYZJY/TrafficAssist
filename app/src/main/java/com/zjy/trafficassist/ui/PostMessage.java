@@ -29,6 +29,7 @@ import com.zjy.trafficassist.model.AlarmHistory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -44,12 +45,11 @@ public class PostMessage extends BaseActivity {
     private Button btn_commit;
     private Uri imageUri;
     private Bitmap bitmap;
+    private File imgFile;
     //Snackbar的容器
     private CoordinatorLayout container;
 
     private AlarmHistory mHistory;
-    private ArrayList<byte[]> picture = new ArrayList<>();
-    private byte[] pic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class PostMessage extends BaseActivity {
                             //创建File对象，用于存储照片
 //                            File image = new File(Environment.getExternalStorageDirectory()
 //                                        + File.separator + Environment.DIRECTORY_DCIM, "1.jpg");
-                            File image = new File(Environment.getExternalStorageDirectory(), "/DICM/Camera/1.jpg");
+                            File image = new File(Environment.getExternalStorageDirectory(), "1.jpg");
                             try {
                                 if (image.exists()) {
                                     image.delete();
@@ -124,9 +124,12 @@ public class PostMessage extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                mHistory = new AlarmHistory(isSerious.isChecked(),
-                        accident_edit.getText().toString(), UserStatus.user.getNickname(),
-                        UserStatus.user.getUsername(), pic);
+                mHistory = new AlarmHistory(
+                        isSerious.isChecked(),
+                        accident_edit.getText().toString(),
+                        UserStatus.user.getNickname(),
+                        UserStatus.user.getUsername(),
+                        imgFile);
 
                 final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
                 mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -139,6 +142,7 @@ public class PostMessage extends BaseActivity {
                     @Override
                     protected Boolean doInBackground(Void... params) {
                         ReturnCode = WebService.UploadHistory(mHistory);
+//                        return WebService.UploadImage(mHistory);
                         return Boolean.parseBoolean(ReturnCode);
                     }
 
@@ -164,8 +168,10 @@ public class PostMessage extends BaseActivity {
             switch (requestCode) {
                 case TAKE_PHOTO:
                     try {
-                        bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
-                        pic = getImageByte(bitmap);
+                        bitmap = BitmapFactory.decodeStream(getContentResolver().
+                                openInputStream(imageUri));
+                        //Bitmap mini = TransForm.comp(bitmap);
+                        imgFile = getImageFile(bitmap);
                         add_pic.setImageBitmap(bitmap);
                         PIC_SELECTED = PIC_SELECTED + 1;
                     } catch (FileNotFoundException e) {
@@ -179,8 +185,9 @@ public class PostMessage extends BaseActivity {
                         //获得图片的uri
                         Uri uri = data.getData();
                         bitmap = MediaStore.Images.Media.getBitmap(resolver, uri);
-                        pic = getImageByte(bitmap);
-                        add_pic.setImageBitmap(bitmap);
+                        Bitmap mini = TransForm.comp(bitmap);
+                        imgFile = getImageFile(bitmap);
+                        add_pic.setImageBitmap(mini);
                         PIC_SELECTED = PIC_SELECTED + 1;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -190,9 +197,29 @@ public class PostMessage extends BaseActivity {
         }
     }
 
+    public File getImageFile(Bitmap mBitmap)  {
+        String path = "/storage/emulated/0/TrafficAssist/";
+        File Dir = new File(path);
+        if(!Dir.exists())
+            Dir.mkdirs();
+        File file = new File(path + TransForm.DateFileName("IMG") + ".jpg");
+        FileOutputStream fOut = null;
+
+        try {
+            fOut = new FileOutputStream(file);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+            return file;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private byte[] getImageByte(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();
     }
 

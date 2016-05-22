@@ -337,4 +337,3 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         return super.onOptionsItemSelected(item);
     }
 }
-

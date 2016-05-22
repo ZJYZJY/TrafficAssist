@@ -17,14 +17,14 @@
 
         <TextView
             android:id="@+id/text_id"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:text="ID：null" />
 
         <TextView
             android:id="@+id/text_username"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_id"
             android:paddingLeft="5dp"
@@ -32,7 +32,7 @@
 
         <TextView
             android:id="@+id/text_detail"
-            android:layout_width="match_parent"
+            android:layout_width="250dp"
             android:layout_height="40dp"
             android:layout_below="@+id/text_username"
             android:paddingLeft="5dp"
@@ -40,11 +40,19 @@
 
         <TextView
             android:id="@+id/text_isSerious"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/text_detail"
             android:paddingLeft="5dp"
             android:text="null" />
+
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/his_pic"
+            android:layout_alignTop="@+id/text_id"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>
