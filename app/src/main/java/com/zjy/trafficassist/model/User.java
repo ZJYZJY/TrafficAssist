@@ -3,6 +3,8 @@ package com.zjy.trafficassist.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.amap.api.maps.model.LatLng;
+
 /**
  * Created by ZJY on 2016/4/14.
  */
@@ -11,6 +13,7 @@ public class User {
     private String username;
     private String password;
     private String nickname;
+    private LatLng location;
 
     public User(String username, String password) {
         this.username = username;
@@ -30,6 +33,10 @@ public class User {
         return nickname;
     }
 
+    public LatLng getLocation() {
+        return location;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -40,5 +47,9 @@ public class User {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void setLocation(LatLng location) {
+        this.location = location;
     }
 }

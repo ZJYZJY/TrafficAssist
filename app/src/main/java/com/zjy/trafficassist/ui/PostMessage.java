@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
@@ -77,7 +78,7 @@ public class PostMessage extends BaseActivity {
                             //创建File对象，用于存储照片
 //                            File image = new File(Environment.getExternalStorageDirectory()
 //                                        + File.separator + Environment.DIRECTORY_DCIM, "1.jpg");
-                            File image = new File(Environment.getExternalStorageDirectory(), "1.jpg");
+                            File image = new File("/storage/emulated/0/TrafficAssist/pic/1.jpg");
                             try {
                                 if (image.exists()) {
                                     image.delete();
@@ -129,7 +130,8 @@ public class PostMessage extends BaseActivity {
                         accident_edit.getText().toString(),
                         UserStatus.user.getNickname(),
                         UserStatus.user.getUsername(),
-                        imgFile);
+                        imgFile,
+                        UserStatus.user.getLocation());
 
                 final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
                 mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -143,6 +145,7 @@ public class PostMessage extends BaseActivity {
                     protected Boolean doInBackground(Void... params) {
                         ReturnCode = WebService.UploadHistory(mHistory);
 //                        return WebService.UploadImage(mHistory);
+                        System.out.println(ReturnCode);
                         return Boolean.parseBoolean(ReturnCode);
                     }
 

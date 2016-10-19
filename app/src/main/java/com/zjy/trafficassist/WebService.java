@@ -2,6 +2,7 @@ package com.zjy.trafficassist;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import com.zjy.trafficassist.model.AlarmHistory;
 
@@ -37,13 +38,14 @@ public class WebService {
      * 对应servlet的URL
      */
     private static String path;
-    private static String server_IP = "192.168.31.100:8080";
+    private static String server_IP = "192.168.31.100";
 
     /**
      * 与HTTP服务器通信，进行登录
      */
     public static String Login(String username, String password) {
-        path = "http://" + server_IP + "/TrafficAssistSever/LoginLet";
+//        path = "http://" + server_IP + "/TrafficAssistSever/LoginLet";
+        path = "http://" + server_IP + "/TrafficAssist/login.php";
         path = path + "?username=" + username + "&password=" + password;
         return Connect();
     }
@@ -52,7 +54,8 @@ public class WebService {
      * 与HTTP服务器通信，进行注册
      */
     public static String Register(String username, String password) {
-        path = "http://" + server_IP + "/TrafficAssistSever/RegisterLet";
+//        path = "http://" + server_IP + "/TrafficAssistSever/RegisterLet";
+        path = "http://" + server_IP + "/TrafficAssist/register.php";
         path = path + "?username=" + username + "&password=" + password;
         return Connect();
     }
@@ -122,10 +125,10 @@ public class WebService {
         JSONObject json = new JSONObject();
 
         try {
-            if (!UploadImage(alarmHistory))
-                return null;
+//            if (!UploadImage(alarmHistory))
+//                return null;
 
-            path = "http://" + server_IP + "/TrafficAssistSever/UploadHistory";
+            path = "http://" + server_IP + "/TrafficAssist/uploadHistory.php";
             connection = (HttpURLConnection) new URL(path).openConnection();
             connection.setConnectTimeout(10000); // 设置超时时间
             connection.setReadTimeout(10000);
@@ -138,16 +141,18 @@ public class WebService {
             json.put("detail", alarmHistory.getDetail());
             json.put("nickname", alarmHistory.getNickname());
             json.put("username", alarmHistory.getUsername());
+            json.put("longitude", alarmHistory.getLocation().longitude);
+            json.put("latitude", alarmHistory.getLocation().latitude);
 //            json.put("picture", new String(alarmHistory.getPicture(), "ISO-8859-1"));
 //            System.out.println(json.toString());
 
             OutputStream os = connection.getOutputStream();
-            os.write(json.toString().getBytes("ISO-8859-1"));
+            os.write(json.toString().getBytes("UTF-8"));//ISO-8859-1
             os.flush();
             os.close();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                System.out.println("ok");
+                Log.d("webservice","http_ok");
                 is = connection.getInputStream();
                 isr = new InputStreamReader(is);
                 br = new BufferedReader(isr);
@@ -278,6 +283,7 @@ public class WebService {
                 br.close();
                 isr.close();
                 is.close();
+                System.out.println(info);
                 return info;
             }
         } catch (Exception e) {

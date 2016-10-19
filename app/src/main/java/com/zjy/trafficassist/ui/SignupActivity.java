@@ -100,6 +100,7 @@ public class SignupActivity extends BaseActivity {
                 @Override
                 protected Boolean doInBackground(Void... params) {
                     ReturnCode = WebService.Register(user.getUsername(), user.getPassword());
+                    System.out.println(ReturnCode);
                     return Boolean.parseBoolean(ReturnCode);
                 }
 

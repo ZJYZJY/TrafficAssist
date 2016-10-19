@@ -28,7 +28,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="d1825b7b8c7f0c96e636f0d00c0a12f3" />
+            android:value="0ae8117dd5ebed966cd54d8040615d76" />
 
         <!-- 定位需要的服务 使用2.0的定位需要加上这个 -->
         <service android:name="com.amap.api.location.APSService" />
@@ -59,8 +59,12 @@
             android:name=".ui.AlarmHistory"
             android:label="@string/label_alarm_history"
             android:theme="@style/JK.SwipeBack.Transparent.Theme" />
-        <activity android:name=".ui.DetailedInfo" />
-        <activity android:name=".ui.UserInfo"></activity>
+        <activity
+            android:name=".ui.DetailedInfo"
+            android:label="@string/label_detailed_info" />
+        <activity
+            android:name=".ui.UserInfo"
+            android:label="@string/label_user_info" />
     </application>
 
 </manifest>

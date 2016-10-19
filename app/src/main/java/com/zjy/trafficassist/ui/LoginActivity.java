@@ -298,6 +298,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 return false;
             }
             ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
+//            System.out.println(ReturnCode);
             return Boolean.parseBoolean(ReturnCode);
         }
 

@@ -2,6 +2,8 @@ package com.zjy.trafficassist.model;
 
 import android.graphics.Bitmap;
 
+import com.amap.api.maps.model.LatLng;
+
 import java.io.File;
 
 /**
@@ -16,6 +18,7 @@ public class AlarmHistory {
     private String detail;
     private Bitmap picture;
     private File file;
+    private LatLng location;
     private boolean isSerious;
     public static String serious;
 
@@ -41,9 +44,10 @@ public class AlarmHistory {
 
     // 用于构造上传时的数据
     public AlarmHistory(boolean isSerious, String detail, String nickname,
-                        String username, File file) {
+                        String username, File file, LatLng location) {
         this(isSerious, detail, nickname, username);
         this.file = file;
+        this.location = location;
     }
 
     public void setSerious(boolean serious) {
@@ -68,6 +72,14 @@ public class AlarmHistory {
 
     public void setPicture(Bitmap bitmap) {
         picture = bitmap;
+    }
+
+    public void setLocation(LatLng location) {
+        this.location = location;
+    }
+
+    public LatLng getLocation() {
+        return location;
     }
 
     public int getId() {

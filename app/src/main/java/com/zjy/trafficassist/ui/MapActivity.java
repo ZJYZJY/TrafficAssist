@@ -30,6 +30,7 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.LatLng;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
@@ -155,6 +156,7 @@ public class MapActivity extends AppCompatActivity
 //                aMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude())));
                 // 显示系统小蓝点
                 mListener.onLocationChanged(amapLocation);
+                UserStatus.user.setLocation(new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude()));
                 //BitmapDescriptorFactory.fromView(view)//自定义Marker
                 // 停止定位请求
                 //mlocationClient.stopLocation();
@@ -249,22 +251,22 @@ public class MapActivity extends AppCompatActivity
         //侧边导航栏按键监听事件
         int id = item.getItemId();
 
-        if (id == R.id.user_info) {
-
-        } else if (id == R.id.alarm_history) {
-            if(UserStatus.Login_status)
+        if(UserStatus.Login_status) {
+            if (id == R.id.user_info) {
+                startActivity(new Intent(MapActivity.this, UserInfo.class));
+            } else if (id == R.id.alarm_history) {
                 startActivity(new Intent(MapActivity.this, AlarmHistory.class));
-            else{
-                Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MapActivity.this, LoginActivity.class));
-            }
-        } else if (id == R.id.nav_refer) {
+            } else if (id == R.id.nav_refer) {
 
-        } else if (id == R.id.nav_setting) {
+            } else if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.nav_about) {
+            } else if (id == R.id.nav_about) {
 //            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
 //                    + "条数据", Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MapActivity.this, LoginActivity.class));
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -276,10 +278,18 @@ public class MapActivity extends AppCompatActivity
         //主界面按钮监听事件
         switch (v.getId()) {
             case R.id.fab_post:
-                startActivity(new Intent(MapActivity.this, PostMessage.class));
+                if(UserStatus.Login_status)
+                    startActivity(new Intent(MapActivity.this, PostMessage.class));
+                else{
+                    Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                }
                 break;
             case R.id.login_map_aty:
                 startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                break;
+            case R.id.display_user_name:
+                startActivity(new Intent(MapActivity.this, UserInfo.class));
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);

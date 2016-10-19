@@ -115,13 +115,13 @@ public class AlarmHistory extends BaseActivity {
                         for (int i = 0; i < ReturnCode.size(); i++) {
                             history_item.add(ReturnCode.get(i));
                         }
-//                        mPDialog.dismiss();
+                        mPDialog.dismiss();
                         historyListAdapter.notifyDataSetChanged();
                     } else {
-//                        mPDialog.dismiss();
+                        mPDialog.dismiss();
                         Toast.makeText(AlarmHistory.this, "没有历史记录", Toast.LENGTH_SHORT).show();
                     }
-                    mPDialog.dismiss();
+//                    mPDialog.dismiss();
                 }
             }.execute();
         }
