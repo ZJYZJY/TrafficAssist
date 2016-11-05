@@ -64,6 +64,7 @@
             android:label="@string/label_detailed_info" />
         <activity
             android:name=".ui.UserInfo"
+            android:theme="@style/AppTheme_NoTopBar"
             android:label="@string/label_user_info" />
     </application>
 

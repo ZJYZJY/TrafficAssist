@@ -1,7 +1,6 @@
 package com.zjy.trafficassist.ui;
 
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -10,17 +9,14 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.adapter.HistoryListAdapter;
-import com.zjy.trafficassist.TransForm;
+import com.zjy.trafficassist.utils.TransForm;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.WebService;
-
-import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;

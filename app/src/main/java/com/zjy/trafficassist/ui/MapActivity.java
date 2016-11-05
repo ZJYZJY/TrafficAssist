@@ -2,6 +2,7 @@ package com.zjy.trafficassist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,12 +29,19 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.Circle;
+import com.amap.api.maps.model.CircleOptions;
 import com.amap.api.maps.model.LatLng;
-import com.zjy.trafficassist.DatabaseManager;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.utils.SensorEventHelper;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -46,7 +54,11 @@ public class MapActivity extends AppCompatActivity
     // 定位
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
+    private Marker mLocMarker;
+    private Circle mCircle;
+    private LatLng location;
 
+    private SensorEventHelper mSensorHelper;
     private FloatingActionButton fab_post;
     private Button login;
     private NavigationView navigationView;
@@ -55,7 +67,10 @@ public class MapActivity extends AppCompatActivity
     private ImageView display_user_pic;
     private Button display_user_name;
 
+    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
+    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
     private long exitTime = 0;
+    private boolean mFirstFix = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +111,8 @@ public class MapActivity extends AppCompatActivity
             aMap.setMapType(AMap.MAP_TYPE_NORMAL);
             setUpMap();
         }
+        mSensorHelper = new SensorEventHelper(this);
+        mSensorHelper.registerSensorListener();
     }
 
     //定位功能
@@ -119,7 +136,6 @@ public class MapActivity extends AppCompatActivity
             mLocationOption.setKillProcess(true);
             //设置定位监听
             mlocationClient.setLocationListener(this);
-
             //设置为高精度定位模式
             mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
             //设置是否返回地址信息（默认返回地址信息）
@@ -144,6 +160,32 @@ public class MapActivity extends AppCompatActivity
         mlocationClient = null;
     }
 
+    private void addCircle(LatLng latlng, double radius) {
+        CircleOptions options = new CircleOptions();
+        options.strokeWidth(1f);
+        options.fillColor(FILL_COLOR);
+        options.strokeColor(STROKE_COLOR);
+        options.center(latlng);
+        options.radius(radius);
+        mCircle = aMap.addCircle(options);
+    }
+
+    private void addMarker(LatLng latlng) {
+        if (mLocMarker != null) {
+            return;
+        }
+//        Bitmap bMap = BitmapFactory.decodeResource(this.getResources(),
+//                R.mipmap.navi_map_gps_locked);
+//        BitmapDescriptor des = BitmapDescriptorFactory.fromBitmap(bMap);
+
+		BitmapDescriptor des = BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked);
+        MarkerOptions options = new MarkerOptions();
+        options.icon(des);
+        options.anchor(0.5f, 0.5f);
+        options.position(latlng);
+        mLocMarker = aMap.addMarker(options);
+    }
+
     /**
      * 定位成功后回调函数
      */
@@ -151,33 +193,24 @@ public class MapActivity extends AppCompatActivity
     public void onLocationChanged(AMapLocation amapLocation) {
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-//                aMap.animateCamera(CameraUpdateFactory.zoomBy(19f), 1000, null);
-//                aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude()), 15f), 1000, null);
-//                aMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude())));
                 // 显示系统小蓝点
-                mListener.onLocationChanged(amapLocation);
-                UserStatus.user.setLocation(new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude()));
-                //BitmapDescriptorFactory.fromView(view)//自定义Marker
-                // 停止定位请求
-                //mlocationClient.stopLocation();
-                amapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
-                amapLocation.getLatitude();//获取纬度
-                amapLocation.getLongitude();//获取经度
-                amapLocation.getAccuracy();//获取精度信息
-//                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                Date date = new Date(amapLocation.getTime());
-//                df.format(date);//定位时间
-                amapLocation.getAddress();//地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
-                amapLocation.getCountry();//国家信息
-                amapLocation.getProvince();//省信息
-                amapLocation.getCity();//城市信息
-                amapLocation.getDistrict();//城区信息
-                amapLocation.getStreet();//街道信息
-                amapLocation.getStreetNum();//街道门牌号信息
-                amapLocation.getCityCode();//城市编码
-                amapLocation.getAdCode();//地区编码
-                //amapLocation.getAOIName();//获取当前定位点的AOI信息
-                mlocationClient.stopLocation(); //停止定位
+//                mListener.onLocationChanged(amapLocation);
+                location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
+                if(UserStatus.user != null) {
+                    UserStatus.user.setLocation(location);
+                }
+                if (!mFirstFix) {
+                    mFirstFix = true;
+                    addCircle(location, amapLocation.getAccuracy());//添加定位精度圆
+                    addMarker(location);//添加定位图标
+                    mSensorHelper.setCurrentMarker(mLocMarker);//定位图标旋转
+                    aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+                } else {
+                    mCircle.setCenter(location);
+                    mCircle.setRadius(amapLocation.getAccuracy());
+                    mLocMarker.setPosition(location);
+                }
+//                mlocationClient.stopLocation(); //停止定位
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
                 Log.e("AmapErr", errText);
@@ -322,12 +355,21 @@ public class MapActivity extends AppCompatActivity
         }
         logined.setVisibility(UserStatus.Login_status ? View.VISIBLE : View.GONE);
         unlogin.setVisibility(UserStatus.Login_status ? View.GONE : View.VISIBLE);
+        if (mSensorHelper != null) {
+            mSensorHelper.registerSensorListener();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (mSensorHelper != null) {
+            mSensorHelper.unRegisterSensorListener();
+            mSensorHelper.setCurrentMarker(null);
+            mSensorHelper = null;
+        }
         mapView.onPause();
+        mFirstFix = false;
     }
 
     @Override

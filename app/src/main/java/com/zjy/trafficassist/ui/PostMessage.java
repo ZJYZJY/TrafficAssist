@@ -5,9 +5,7 @@ import android.content.ContentResolver;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
@@ -15,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,13 +25,13 @@ import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.utils.TransForm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class PostMessage extends BaseActivity {
 
@@ -78,7 +77,8 @@ public class PostMessage extends BaseActivity {
                             //创建File对象，用于存储照片
 //                            File image = new File(Environment.getExternalStorageDirectory()
 //                                        + File.separator + Environment.DIRECTORY_DCIM, "1.jpg");
-                            File image = new File("/storage/emulated/0/TrafficAssist/pic/1.jpg");
+                            File image = new File("/storage/emulated/0/TrafficAssist/uploadTmp/"
+                                    + TransForm.DateFileName("IMG") + ".jpg");
                             try {
                                 if (image.exists()) {
                                     image.delete();
@@ -144,8 +144,7 @@ public class PostMessage extends BaseActivity {
                     @Override
                     protected Boolean doInBackground(Void... params) {
                         ReturnCode = WebService.UploadHistory(mHistory);
-//                        return WebService.UploadImage(mHistory);
-                        System.out.println(ReturnCode);
+                        Log.d("postMsg", ReturnCode);
                         return Boolean.parseBoolean(ReturnCode);
                     }
 
@@ -201,7 +200,7 @@ public class PostMessage extends BaseActivity {
     }
 
     public File getImageFile(Bitmap mBitmap)  {
-        String path = "/storage/emulated/0/TrafficAssist/";
+        String path = "/storage/emulated/0/TrafficAssist/uploadTmp";
         File Dir = new File(path);
         if(!Dir.exists())
             Dir.mkdirs();

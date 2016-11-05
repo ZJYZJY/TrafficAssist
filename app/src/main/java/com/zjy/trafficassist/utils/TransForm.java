@@ -1,8 +1,10 @@
-package com.zjy.trafficassist;
+package com.zjy.trafficassist.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.WebService;
 import com.zjy.trafficassist.model.AlarmHistory;
 
 import org.json.JSONArray;
@@ -42,7 +44,7 @@ public class TransForm {
                 String str_detail = (String) detail.get("detail");
                 String filename = (String) detail.get("fileName");
 //                System.out.println(filename);
-                Bitmap bitmap = WebService.GetLocalOrNetBitmap("http://192.168.31.100:8080/TrafficAssistSever/Image/" + filename);
+                Bitmap bitmap = WebService.GetLocalOrNetBitmap("http://192.168.31.100/TrafficAssist/AccidentImage/" + filename);
                 alarmHistories.add(new AlarmHistory(true,
                         str_detail,
                         UserStatus.user.getNickname(),

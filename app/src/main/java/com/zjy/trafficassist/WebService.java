@@ -15,17 +15,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * Created on 2016/4/20.
@@ -63,8 +58,8 @@ public class WebService {
     /**
      * 将图片上传至服务器
      */
-    public static boolean UploadImage(AlarmHistory alarmHistory) {
-        path = "http://" + server_IP + "/TrafficAssistSever/UploadImage";
+    public static String UploadImage(AlarmHistory alarmHistory) {
+        path = "http://" + server_IP + "/TrafficAssist/uploadImage.php";
         File file = alarmHistory.getFile();
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(path).openConnection();
@@ -76,21 +71,12 @@ public class WebService {
             conn.setRequestMethod("POST"); //请求方式
             conn.setRequestProperty("Charset", "UTF-8");//设置编码
             if (file != null) {
-                /** * 当文件不为空，把文件包装并且上传 */
+                /** 当文件不为空，把文件包装并且上传 */
                 OutputStream outputSteam = conn.getOutputStream();
                 DataOutputStream dos = new DataOutputStream(outputSteam);
-//                /**
-//                 * 这里重点注意：
-//                 * name里面的值为服务器端需要key 只有这个key 才可以得到对应的文件
-//                 * filename是文件的名字，包含后缀名的 比如:abc.png
-//                 */
-//                sb.append("Content-Disposition: form-data; name=\"img\"; filename=\"");
-//                sb.append(file.getName()).append("\"").append(LINE_END);
-//                sb.append("Content-Type: application/octet-stream; charset=" + "UTF-8");
-//                //sb.append(LINE_END);
-//                sb.append(LINE_END);
-
                 InputStream is = new FileInputStream(file);
+                InputStreamReader isr;
+                BufferedReader br;
                 byte[] bytes = new byte[1024];
                 int len = 0;
                 while ((len = is.read(bytes)) != -1) {
@@ -98,19 +84,28 @@ public class WebService {
                 }
                 is.close();
                 dos.flush();
-                /**
-                 * 获取响应码 200=成功
-                 * 当响应成功，获取响应的流
-                 */
+                /** 当响应成功，获取响应的流 */
                 //Log.e(TAG, "response code:"+res);
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    return true;
+                    is = conn.getInputStream();
+                    isr = new InputStreamReader(is);
+                    br = new BufferedReader(isr);
+                    String line, filename = "";
+                    while ((line = br.readLine()) != null) {
+                        filename = filename + line;
+                    }
+                    br.close();
+                    isr.close();
+                    is.close();
+                    return filename;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d("IOException", "gg");
+            return null;
         }
-        return false;
+        return null;
     }
 
     /**
@@ -125,8 +120,11 @@ public class WebService {
         JSONObject json = new JSONObject();
 
         try {
-//            if (!UploadImage(alarmHistory))
-//                return null;
+            String filename =  UploadImage(alarmHistory);
+            if (filename == null) {
+                Log.d("uploadhistory", "图片上传失败");
+                return null;
+            }
 
             path = "http://" + server_IP + "/TrafficAssist/uploadHistory.php";
             connection = (HttpURLConnection) new URL(path).openConnection();
@@ -143,8 +141,7 @@ public class WebService {
             json.put("username", alarmHistory.getUsername());
             json.put("longitude", alarmHistory.getLocation().longitude);
             json.put("latitude", alarmHistory.getLocation().latitude);
-//            json.put("picture", new String(alarmHistory.getPicture(), "ISO-8859-1"));
-//            System.out.println(json.toString());
+            json.put("filename", filename);
 
             OutputStream os = connection.getOutputStream();
             os.write(json.toString().getBytes("UTF-8"));//ISO-8859-1
@@ -152,7 +149,6 @@ public class WebService {
             os.close();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                Log.d("webservice","http_ok");
                 is = connection.getInputStream();
                 isr = new InputStreamReader(is);
                 br = new BufferedReader(isr);
@@ -163,7 +159,7 @@ public class WebService {
                 br.close();
                 isr.close();
                 is.close();
-
+                Log.d("uploadhistory_return", info);
                 return info;
                 //return parseInfo(is);
             }
@@ -189,46 +185,10 @@ public class WebService {
      * 与HTTP服务器通信，获取报警信息到本地
      */
     public static String DownloadHistory() {
-        path = "http://" + server_IP + "/TrafficAssistSever/DownloadHistory";
+        path = "http://" + server_IP + "/TrafficAssist/downloadHistory.php";
         path = path + "?username=" + UserStatus.user.getUsername();
         return Connect();
     }
-
-//    /**
-//     * 与HTTP服务器通信，获取报警照片到本地
-//     */
-//    public static Bitmap DownloadImage() {
-//        path = "http://" + server_IP + "/TrafficAssistSever/DownloadImage";
-//        path = path + "?username=" + UserStatus.user.getUsername();
-//        File file = null;
-//        try {
-//            HttpURLConnection conn = (HttpURLConnection) new URL(path).openConnection();
-//            conn.setReadTimeout(60000);
-//            conn.setConnectTimeout(60000);
-//            conn.setDoInput(true); //允许输入流
-//            conn.setDoOutput(true); //允许输出流
-//            conn.setUseCaches(false); //不允许使用缓存
-//            conn.setRequestMethod("POST"); //请求方式
-//            conn.setRequestProperty("Charset", "UTF-8");
-//
-//            String loadpath = "/storage/emulated/0/TrafficAssist/temp/";; //下载文件存放目录
-//            file = new File(loadpath);
-//            if (!file.exists())
-//                file.mkdirs();
-//            InputStream is = conn.getInputStream();
-//            FileOutputStream fos = new FileOutputStream(loadpath + TransForm.DateFileName("IMG") + ".jpg");
-//            // 将输入流is写入文件输出流fos中
-//            int ch = 0;
-//            while ((ch = is.read()) != -1)
-//                fos.write(ch);
-//            fos.close();
-//            is.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return TransForm.getPicFromFile(file);
-//    }
 
     public static Bitmap GetLocalOrNetBitmap(String url) {
         int IO_BUFFER_SIZE = 2*1024;
