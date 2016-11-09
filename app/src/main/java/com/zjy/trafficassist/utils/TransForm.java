@@ -43,13 +43,12 @@ public class TransForm {
                 JSONObject detail = (JSONObject) histories.get(i);
                 String str_detail = (String) detail.get("detail");
                 String filename = (String) detail.get("fileName");
-//                System.out.println(filename);
                 Bitmap bitmap = WebService.GetLocalOrNetBitmap("http://192.168.31.100/TrafficAssist/AccidentImage/" + filename);
-                alarmHistories.add(new AlarmHistory(true,
-                        str_detail,
-                        UserStatus.user.getNickname(),
-                        UserStatus.user.getUsername(),
-                        bitmap));
+//                alarmHistories.add(new AlarmHistory(true,
+//                        str_detail,
+//                        UserStatus.user.getNickname(),
+//                        UserStatus.user.getUsername(),
+//                        bitmap));
             }
         } catch (JSONException e) {
             e.printStackTrace();

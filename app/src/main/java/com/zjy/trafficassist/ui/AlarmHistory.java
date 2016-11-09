@@ -121,7 +121,7 @@ public class AlarmHistory extends BaseActivity {
                 }
             }.execute();
         }
-//        databaseManager.SaveHistory(history_item);
+//        databaseManager.SaveHistory(item_history);
         return history_item;
     }
 

@@ -28,7 +28,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_history, parent, false);
 //        v.setOnClickListener(this);
         return new ViewHolder(v);
     }
@@ -42,8 +42,8 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
             holder.text_isSerious.setText("严重？：YES");
         else
             holder.text_isSerious.setText("严重？：No");
-        if(alarmHistories.get(position).getPicture() != null)
-            holder.his_pic.setImageBitmap(alarmHistories.get(position).getPicture());
+        if(alarmHistories.get(position).getPictures() != null)
+            holder.his_pic.setImageBitmap(alarmHistories.get(position).getPictures().get(0));
     }
 
     @Override

@@ -66,6 +66,14 @@
             android:name=".ui.UserInfo"
             android:theme="@style/AppTheme_NoTopBar"
             android:label="@string/label_user_info" />
-    </application>
+        <activity
+            android:theme="@style/customTheme"
+            android:name="me.iwf.photopicker.PhotoPickerActivity"
+            />
 
+        <activity
+            android:theme="@style/customTheme"
+            android:name="me.iwf.photopicker.PhotoPagerActivity"
+            />
+    </application>
 </manifest>
