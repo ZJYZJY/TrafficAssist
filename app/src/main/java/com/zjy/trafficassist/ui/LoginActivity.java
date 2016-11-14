@@ -210,7 +210,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             mPDialog = new ProgressDialog(LoginActivity.this);
             mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mPDialog.setMessage(getResources().getString(R.string.now_user_login));
-            mPDialog.setCancelable(true);
+            mPDialog.setCancelable(false);
             mPDialog.show();
             mAuthTask = new UserLoginTask();
             mAuthTask.execute();

@@ -75,7 +75,7 @@ public class AlarmHistory extends BaseActivity {
                         internet_history = getListItem();
                         RefreshLayout.setRefreshing(false);
                     }
-                }, 10000);
+                }, 3000);
             }
         });
     }
@@ -127,14 +127,11 @@ public class AlarmHistory extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
-                finish();
+                onBackPressed();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

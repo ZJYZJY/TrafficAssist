@@ -49,22 +49,22 @@ public class DatabaseManager {
         return false;
     }
 
-    public void SaveHistory(ArrayList<AlarmHistory> alarmHistories) {
-        database.beginTransaction();  //开始事务
-        try {
-            for(int i = 0; i < alarmHistories.size(); i++) {
-                database.execSQL("INSERT INTO user_history VALUES(null, ?, ?, ?, null)",
-                        new Object[]{alarmHistories.get(i).getNickname(),
-                                alarmHistories.get(i).getDetail(),
-                                String.valueOf(alarmHistories.get(i).isSerious())});
-            }
-            database.setTransactionSuccessful();  //设置事务成功完成
-            System.out.println("写入成功");
-        } finally {
-            database.endTransaction();    //结束事务
-        }
-        database.close();
-    }
+//    public void SaveHistory(ArrayList<AlarmHistory> alarmHistories) {
+//        database.beginTransaction();  //开始事务
+//        try {
+//            for(int i = 0; i < alarmHistories.size(); i++) {
+//                database.execSQL("INSERT INTO user_history VALUES(null, ?, ?, ?, null)",
+//                        new Object[]{alarmHistories.get(i).getNickname(),
+//                                alarmHistories.get(i).getaccidentTags(),
+//                                String.valueOf(alarmHistories.get(i).isSerious())});
+//            }
+//            database.setTransactionSuccessful();  //设置事务成功完成
+//            System.out.println("写入成功");
+//        } finally {
+//            database.endTransaction();    //结束事务
+//        }
+//        database.close();
+//    }
 
 //    public ArrayList<AlarmHistory> LoadHistory() {
 //        ArrayList<AlarmHistory> alarmHistories = new ArrayList<>();

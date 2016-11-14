@@ -37,11 +37,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.text_id.setText("ID：" + String.valueOf(getItemId(position) + 1));
         holder.text_username.setText("用户名：" + alarmHistories.get(position).getNickname());
-        holder.text_detail.setText("详情：" + alarmHistories.get(position).getDetail());
-        if(alarmHistories.get(position).isSerious())
-            holder.text_isSerious.setText("严重？：YES");
-        else
-            holder.text_isSerious.setText("严重？：No");
+        holder.text_acctag.setText("详情：" + alarmHistories.get(position).getaccidentTags());
         if(alarmHistories.get(position).getPictures() != null)
             holder.his_pic.setImageBitmap(alarmHistories.get(position).getPictures().get(0));
     }
@@ -56,20 +52,18 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         return alarmHistories == null ? 0 : alarmHistories.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView text_id;
-        public TextView text_username;
-        public TextView text_detail;
-        public TextView text_isSerious;
-        public ImageView his_pic;
+        TextView text_id;
+        TextView text_username;
+        TextView text_acctag;
+        ImageView his_pic;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             text_id = (TextView) itemView.findViewById(R.id.text_id);
             text_username = (TextView) itemView.findViewById(R.id.text_username);
-            text_detail = (TextView) itemView.findViewById(R.id.text_detail);
-            text_isSerious = (TextView) itemView.findViewById(R.id.text_isSerious);
+            text_acctag = (TextView) itemView.findViewById(R.id.text_acctag);
             his_pic = (ImageView) itemView.findViewById(R.id.his_pic);
         }
     }

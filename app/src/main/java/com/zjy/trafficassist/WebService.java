@@ -127,8 +127,9 @@ public class WebService {
             /**
              * 上传记录时首先上传图片
              */
-            if(alarmHistory.getFiles().size() > 0)
-                filenames =  UploadImage(alarmHistory.getFiles(), alarmHistory.getUsername());
+            if(alarmHistory != null)
+                if(alarmHistory.getFiles().size() > 0)
+                    filenames =  UploadImage(alarmHistory.getFiles(), alarmHistory.getUsername());
             if (filenames == null || filenames.size() <= 0) {
                 Log.d("uploadhistory", "图片上传失败");
                 return null;
@@ -144,17 +145,17 @@ public class WebService {
             connection.setRequestProperty("Charset", "UTF-8"); // 设置接收数据编码格式
 
             String NamesString = "";
-            for(int i = 0; i < filenames.size(); i++) {
-                NamesString += filenames.get(i) + "/";
+            NamesString = filenames.get(0);
+            for(int i = 1; i < filenames.size(); i++) {
+                NamesString += "/" + filenames.get(i);
             }
-            Log.e("fileNames", NamesString);
-            json.put("isSerious", alarmHistory.isSerious());
-            json.put("detail", alarmHistory.getDetail());
+            Log.d("fileNames", NamesString);
+            json.put("accidentTags", alarmHistory.getaccidentTags());
             json.put("nickname", alarmHistory.getNickname());
             json.put("username", alarmHistory.getUsername());
             json.put("longitude", alarmHistory.getLocation().longitude);
             json.put("latitude", alarmHistory.getLocation().latitude);
-            json.put("filename", NamesString);
+            json.put("filenames", NamesString);
 
             OutputStream os = connection.getOutputStream();
             os.write(json.toString().getBytes("UTF-8"));//ISO-8859-1
@@ -202,7 +203,7 @@ public class WebService {
         return Connect();
     }
 
-    public static Bitmap GetLocalOrNetBitmap(String url) {
+    public static Bitmap getLocalOrNetBitmap(String url) {
         int IO_BUFFER_SIZE = 2*1024;
         Bitmap bitmap = null;
         InputStream in = null;

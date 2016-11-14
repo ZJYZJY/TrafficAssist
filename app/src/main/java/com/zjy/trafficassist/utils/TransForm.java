@@ -2,6 +2,7 @@ package com.zjy.trafficassist.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.WebService;
@@ -35,20 +36,23 @@ public class TransForm {
         if (json == null)
             return null;
         ArrayList<AlarmHistory> alarmHistories = new ArrayList<>();
+        ArrayList<Bitmap> bitmaps = new ArrayList<>();
         JSONObject historyInfo = null;
         try {
             historyInfo = new JSONObject(json);
             JSONArray histories = historyInfo.getJSONArray("allDetails");
             for (int i = 0; i < histories.length(); i++) {
-                JSONObject detail = (JSONObject) histories.get(i);
-                String str_detail = (String) detail.get("detail");
-                String filename = (String) detail.get("fileName");
-                Bitmap bitmap = WebService.GetLocalOrNetBitmap("http://192.168.31.100/TrafficAssist/AccidentImage/" + filename);
-//                alarmHistories.add(new AlarmHistory(true,
-//                        str_detail,
-//                        UserStatus.user.getNickname(),
-//                        UserStatus.user.getUsername(),
-//                        bitmap));
+                JSONObject each_item = (JSONObject) histories.get(i);
+                String str_acctag = (String) each_item.get("detail");
+                JSONArray filenames = each_item.getJSONArray("fileNames");
+                for(int j = 0; j < filenames.length(); j++) {
+                    bitmaps.add(WebService.getLocalOrNetBitmap("http://192.168.31.100/TrafficAssist/AccidentImage/" + filenames.get(j)));
+                }
+                alarmHistories.add(new AlarmHistory(
+                        str_acctag,
+                        UserStatus.user.getNickname(),
+                        UserStatus.user.getUsername(),
+                        bitmaps));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -78,42 +82,52 @@ public class TransForm {
         return null;
     }
 
-    public static Bitmap comp(Bitmap image) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        //判断如果图片大于1M,进行压缩避免在生成图片（BitmapFactory.decodeStream）时溢出
-        if (baos.toByteArray().length / 1024 > 1024) {
-            //重置baos即清空baos
-            baos.reset();
-            //这里压缩50%，把压缩后的数据存放到baos中
-            image.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-        }
-        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+    /**
+     * 图片大小压缩算法
+     * @param filePath 输入图片文件的路径
+     * @return Bitmap
+     */
+    public static Bitmap compressImage(String filePath) {
+        BitmapFactory.Options option = new BitmapFactory.Options();
         //开始读入图片，此时把options.inJustDecodeBounds 设回true了
-        newOpts.inJustDecodeBounds = true;
-        newOpts.inJustDecodeBounds = false;
-        int w = newOpts.outWidth;
-        int h = newOpts.outHeight;
-        float hh = 1920f;//这里设置高度为1920f
-        float ww = 1080f;//这里设置宽度为1080f
-        //缩放比。由于是固定比例缩放，只用高或者宽其中一个数据进行计算即可
-        int be = 1;//be=1表示不缩放
-        if (w > h && w > ww) {//如果宽度大的话根据宽度固定大小缩放
-            be = (int) (newOpts.outWidth / ww);
-        } else if (w < h && h > hh) {//如果高度高的话根据宽度固定大小缩放
-            be = (int) (newOpts.outHeight / hh);
+        option.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(filePath, option);
+        option.inJustDecodeBounds = false;
+//        int w = option.outWidth;
+//        int h = option.outHeight;
+//        float hh = 1280f;//这里设置高度为1920f
+//        float ww = 720f;//这里设置宽度为1080f
+//        //缩放比。由于是固定比例缩放，只用高或者宽其中一个数据进行计算即可
+//        int be = 1;//be=1表示不缩放
+//        if (w > h && w > ww) {//如果宽度大的话根据宽度固定大小缩放
+//            be = (int) (option.outWidth / ww);
+//        } else if (w < h && h > hh) {//如果高度高的话根据宽度固定大小缩放
+//            be = (int) (option.outHeight / hh);
+//        }
+        int bWidth = option.outWidth;
+        int bHeight= option.outHeight;
+        int toWidth = 640;
+        int toHeight = 360;
+        int be = 1;  //be = 1代表不缩放
+        if(bWidth/toWidth>bHeight/toHeight && bWidth>toWidth){//如果宽度大的话根据宽度固定大小缩放
+            be = (int)bWidth/toWidth;
+        }else if(bWidth/toWidth<bHeight/toHeight && bHeight>toHeight){//如果高度高的话根据宽度固定大小缩放
+            be = (int)bHeight/toHeight;
         }
-        if (be <= 0)
-            be = 1;
-        newOpts.inSampleSize = be;//设置缩放比例
+        option.inSampleSize = be;//设置缩放比例
         //重新读入图片，注意此时已经把options.inJustDecodeBounds 设回false了
-        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
-        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
-        return compressImage(bitmap);//压缩好比例大小后再进行质量压缩
+//        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
+//        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, option);
+//        return comp(bitmap);//压缩好比例大小后再进行质量压缩
+        return comp(BitmapFactory.decodeFile(filePath, option));
     }
 
-    public static Bitmap compressImage(Bitmap image) {
+    /**
+     * 图片质量压缩算法
+     * @param image 输入是经过大小压缩的Bitmap
+     * @return Bitmap
+     */
+    private static Bitmap comp(Bitmap image) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         //质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
@@ -121,11 +135,20 @@ public class TransForm {
         int options = 100;
         System.out.println("压缩前" + baos.toByteArray().length);
         //循环判断如果压缩后图片是否大于100kb,大于继续压缩
-        while (baos.toByteArray().length / 1024 > 100) {
-            baos.reset();//重置baos即清空baos
-            //这里压缩options%，把压缩后的数据存放到baos中
-            image.compress(Bitmap.CompressFormat.JPEG, options, baos);
-            options -= 10;//每次都减少10
+        if(baos.toByteArray().length / 1024 > 3000) {
+            while (baos.toByteArray().length / 1024 > 800) {
+                options -= 10;//每次都减少10
+                baos.reset();//重置baos即清空baos
+                //这里压缩options%，把压缩后的数据存放到baos中
+                image.compress(Bitmap.CompressFormat.JPEG, options, baos);
+            }
+        }else {
+            while (baos.toByteArray().length / 1024 > 200) {
+                options -= 10;//每次都减少10
+                baos.reset();//重置baos即清空baos
+                //这里压缩options%，把压缩后的数据存放到baos中
+                image.compress(Bitmap.CompressFormat.JPEG, options, baos);
+            }
         }
         System.out.println("压缩后" + baos.toByteArray().length);
         //把压缩后的数据baos存放到ByteArrayInputStream中

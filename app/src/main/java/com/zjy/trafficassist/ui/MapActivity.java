@@ -47,11 +47,15 @@ public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LocationSource, AMapLocationListener, View.OnClickListener {
 
+    /**
+     * 定位圈的颜色
+     */
+    private static final int STROKE_COLOR   = Color.argb(180, 3, 145, 255);
+    private static final int FILL_COLOR     = Color.argb(10, 0, 0, 180);
+
     private MapView mapView;
     private AMap aMap;
-    // 处理定位更新
     private OnLocationChangedListener mListener;
-    // 定位
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
     private Marker mLocMarker;
@@ -67,8 +71,6 @@ public class MapActivity extends AppCompatActivity
     private ImageView display_user_pic;
     private Button display_user_name;
 
-    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
-    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
     private long exitTime = 0;
     private boolean mFirstFix = false;
 
@@ -105,6 +107,9 @@ public class MapActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    /**
+     * 初始化地图与方向传感器
+     */
     private void Initial() {
         if (aMap == null) {
             aMap = mapView.getMap();
@@ -115,7 +120,9 @@ public class MapActivity extends AppCompatActivity
         mSensorHelper.registerSensorListener();
     }
 
-    //定位功能
+    /**
+     * 设置定位监听，配置地图默认参数
+     */
     private void setUpMap() {
         aMap.setLocationSource(this);// 设置定位监听
         aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮可见
@@ -170,20 +177,17 @@ public class MapActivity extends AppCompatActivity
         mCircle = aMap.addCircle(options);
     }
 
-    private void addMarker(LatLng latlng) {
+    private Marker addMarker(LatLng latlng) {
         if (mLocMarker != null) {
-            return;
+            return null;
         }
-//        Bitmap bMap = BitmapFactory.decodeResource(this.getResources(),
-//                R.mipmap.navi_map_gps_locked);
-//        BitmapDescriptor des = BitmapDescriptorFactory.fromBitmap(bMap);
-
 		BitmapDescriptor des = BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked);
         MarkerOptions options = new MarkerOptions();
         options.icon(des);
         options.anchor(0.5f, 0.5f);
         options.position(latlng);
         mLocMarker = aMap.addMarker(options);
+        return mLocMarker;
     }
 
     /**
@@ -202,15 +206,16 @@ public class MapActivity extends AppCompatActivity
                 if (!mFirstFix) {
                     mFirstFix = true;
                     addCircle(location, amapLocation.getAccuracy());//添加定位精度圆
-                    addMarker(location);//添加定位图标
-                    mSensorHelper.setCurrentMarker(mLocMarker);//定位图标旋转
+                    addMarker(location).setFlat(true);//添加定位图标，并贴附在地图上
                     aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
                 } else {
-                    mCircle.setCenter(location);
-                    mCircle.setRadius(amapLocation.getAccuracy());
+                    mCircle.setCenter(location);// 改变定位精度圆中心
+                    mCircle.setRadius(amapLocation.getAccuracy());// 改变定位精度圆半径
                     mLocMarker.setPosition(location);
                 }
-//                mlocationClient.stopLocation(); //停止定位
+                if(mSensorHelper != null)
+                    mSensorHelper.setCurrentMarker(mLocMarker);//定位图标旋转
+                //mlocationClient.stopLocation(); //停止定位
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
                 Log.e("AmapErr", errText);
@@ -237,11 +242,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if (id == R.id.view_change) {
             //设置地图类型
             AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
@@ -274,7 +275,6 @@ public class MapActivity extends AppCompatActivity
             }
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -283,7 +283,6 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //侧边导航栏按键监听事件
         int id = item.getItemId();
-
         if(UserStatus.Login_status) {
             if (id == R.id.user_info) {
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
@@ -291,17 +290,17 @@ public class MapActivity extends AppCompatActivity
                 startActivity(new Intent(MapActivity.this, AlarmHistory.class));
             } else if (id == R.id.nav_refer) {
 
-            } else if (id == R.id.nav_setting) {
-
-            } else if (id == R.id.nav_about) {
-//            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
-//                    + "条数据", Toast.LENGTH_SHORT).show();
             }
         }else {
             Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MapActivity.this, LoginActivity.class));
         }
+        if (id == R.id.nav_setting) {
 
+        } else if (id == R.id.nav_about) {
+//            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
+//                    + "条数据", Toast.LENGTH_SHORT).show();
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -355,9 +354,10 @@ public class MapActivity extends AppCompatActivity
         }
         logined.setVisibility(UserStatus.Login_status ? View.VISIBLE : View.GONE);
         unlogin.setVisibility(UserStatus.Login_status ? View.GONE : View.VISIBLE);
-        if (mSensorHelper != null) {
-            mSensorHelper.registerSensorListener();
+        if (mSensorHelper == null) {
+            mSensorHelper = new SensorEventHelper(this);
         }
+        mSensorHelper.registerSensorListener();
     }
 
     @Override
