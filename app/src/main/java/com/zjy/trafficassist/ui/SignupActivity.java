@@ -2,6 +2,7 @@ package com.zjy.trafficassist.ui;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
 import android.os.Bundle;
@@ -113,6 +114,7 @@ public class SignupActivity extends BaseActivity {
                         UserStatus.Login_status = true;
                         UserStatus.user = user;
                         finish();
+                        startActivity(new Intent(SignupActivity.this, MapActivity.class));
                     } else {
                         Toast.makeText(SignupActivity.this, "注册失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
                     }

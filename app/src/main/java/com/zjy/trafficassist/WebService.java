@@ -35,13 +35,13 @@ public class WebService {
      * 对应servlet的URL
      */
     private static String path;
-    private static String server_IP = "192.168.31.100";
+    private static String server_IP = "120.27.130.203:8001";
 
     /**
      * 与HTTP服务器通信，进行登录
      */
     public static String Login(String username, String password) {
-        path = "http://" + server_IP + "/TrafficAssist/userApi/login.php";
+        path = "http://" + server_IP + "/trafficassist/userApi/login.php";
         path = path + "?username=" + username + "&password=" + password;
         return Connect();
     }
@@ -50,7 +50,7 @@ public class WebService {
      * 与HTTP服务器通信，进行注册
      */
     public static String Register(String username, String password) {
-        path = "http://" + server_IP + "/TrafficAssist/userApi/register.php";
+        path = "http://" + server_IP + "/trafficassist/userApi/register.php";
         path = path + "?username=" + username + "&password=" + password;
         return Connect();
     }
@@ -59,7 +59,7 @@ public class WebService {
      * 将图片上传至服务器
      */
     public static ArrayList<String> UploadImage(ArrayList<File> files, String username) {
-        path = "http://" + server_IP + "/TrafficAssist/userApi/uploadImage.php?username=" + username;
+        path = "http://" + server_IP + "/trafficassist/userApi/uploadImage.php?username=" + username;
         ArrayList<String> fileNames = new ArrayList<>();
         try {
             for(int i = 0; i < files.size(); i++) {
@@ -73,11 +73,10 @@ public class WebService {
                 conn.setRequestProperty("Charset", "UTF-8");//设置编码
                 if (files.get(i) != null) {
                     /** 当文件不为空，把文件包装并且上传 */
+                    Log.e("image_size", files.get(i).length()+"");
                     OutputStream outputSteam = conn.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(outputSteam);
                     InputStream is = new FileInputStream(files.get(i));
-                    InputStreamReader isr;
-                    BufferedReader br;
                     byte[] bytes = new byte[1024];
                     int len = 0;
                     while ((len = is.read(bytes)) != -1) {
@@ -88,8 +87,11 @@ public class WebService {
                     /** 当响应成功，获取响应的流 */
                     //Log.e(TAG, "response code:"+res);
                     if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                        is = conn.getInputStream();
-                        isr = new InputStreamReader(is);
+                        InputStream is2;
+                        InputStreamReader isr;
+                        BufferedReader br;
+                        is2 = conn.getInputStream();
+                        isr = new InputStreamReader(is2);
                         br = new BufferedReader(isr);
                         String line, filename = "";
                         while ((line = br.readLine()) != null) {
@@ -97,9 +99,8 @@ public class WebService {
                         }
                         br.close();
                         isr.close();
-                        is.close();
+                        is2.close();
                         fileNames.add(filename);
-//                        return filename;
                     }
                 }
             }
@@ -131,11 +132,11 @@ public class WebService {
                 if(alarmHistory.getFiles().size() > 0)
                     filenames =  UploadImage(alarmHistory.getFiles(), alarmHistory.getUsername());
             if (filenames == null || filenames.size() <= 0) {
-                Log.d("uploadhistory", "图片上传失败");
+                Log.e("uploadhistory", "图片上传失败");
                 return null;
             }
 
-            path = "http://" + server_IP + "/TrafficAssist/userApi/uploadHistory.php";
+            path = "http://" + server_IP + "/trafficassist/userApi/uploadHistory.php";
             connection = (HttpURLConnection) new URL(path).openConnection();
             connection.setConnectTimeout(10000); // 设置超时时间
             connection.setReadTimeout(10000);
@@ -198,7 +199,7 @@ public class WebService {
      * 与HTTP服务器通信，获取报警信息到本地
      */
     public static String DownloadHistory() {
-        path = "http://" + server_IP + "/TrafficAssist/userApi/downloadHistory.php";
+        path = "http://" + server_IP + "/trafficassist/userApi/downloadHistory.php";
         path = path + "?username=" + UserStatus.user.getUsername();
         return Connect();
     }

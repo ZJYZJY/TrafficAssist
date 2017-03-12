@@ -55,7 +55,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
-            android:background="@drawable/btn_commit"
+            android:background="@drawable/accent_btn"
             android:text="@string/action_register"
             android:textColor="#ffffff" />
 

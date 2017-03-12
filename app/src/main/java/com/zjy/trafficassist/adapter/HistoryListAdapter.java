@@ -36,7 +36,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.text_id.setText("ID：" + String.valueOf(getItemId(position) + 1));
-        holder.text_username.setText("用户名：" + alarmHistories.get(position).getNickname());
+        holder.text_username.setText("用户名：" + alarmHistories.get(position).getUsername());
         holder.text_acctag.setText("详情：" + alarmHistories.get(position).getaccidentTags());
         if(alarmHistories.get(position).getPictures() != null)
             holder.his_pic.setImageBitmap(alarmHistories.get(position).getPictures().get(0));

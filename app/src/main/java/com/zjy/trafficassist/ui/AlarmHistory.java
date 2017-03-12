@@ -117,7 +117,6 @@ public class AlarmHistory extends BaseActivity {
                         mPDialog.dismiss();
                         Toast.makeText(AlarmHistory.this, "没有历史记录", Toast.LENGTH_SHORT).show();
                     }
-//                    mPDialog.dismiss();
                 }
             }.execute();
         }

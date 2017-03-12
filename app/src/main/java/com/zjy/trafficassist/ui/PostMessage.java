@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
 import com.zjy.trafficassist.model.AlarmHistory;
@@ -82,61 +83,65 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
                 return tv;
             }
         });
+
         recyclerView = (MultiPickResultView) findViewById(R.id.image_picker);
         recyclerView.init(this, MultiPickResultView.ACTION_SELECT, null);
 
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!accidentTags.equals("")){
+                    final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
+                    mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    mPDialog.setMessage(getResources().getString(R.string.now_upload_history));
+                    mPDialog.setCancelable(true);
+                    mPDialog.show();
+                    final ArrayList<String> paths = recyclerView.getPhotos();
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            // 获取选择的图片对应的File对象
+                            imgFiles = getImageFiles(paths);
+                            mHistory = new AlarmHistory(
+                                    accidentTags,
+                                    UserStatus.user.getNickname(),
+                                    UserStatus.user.getUsername(),
+                                    imgFiles,
+                                    UserStatus.user.getLocation());
+                            Log.d("accTags", accidentTags);
+                            return null;
+                        }
 
-                final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
-                mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                mPDialog.setMessage(getResources().getString(R.string.now_upload_history));
-                mPDialog.setCancelable(true);
-                mPDialog.show();
-                final ArrayList<String> paths = recyclerView.getPhotos();
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        // 获取选择的图片对应的File对象
-                        imgFiles = getImageFiles(paths);
-                        mHistory = new AlarmHistory(
-                                accidentTags,
-                                UserStatus.user.getNickname(),
-                                UserStatus.user.getUsername(),
-                                imgFiles,
-                                UserStatus.user.getLocation());
-                        Log.d("accTags", accidentTags);
-                        return null;
-                    }
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            super.onPostExecute(aVoid);
+                            new AsyncTask<Void, Void, Boolean>() {
 
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
-                        new AsyncTask<Void, Void, Boolean>() {
-
-                            String ReturnCode;
-                            @Override
-                            protected Boolean doInBackground(Void... params) {
-                                ReturnCode = WebService.UploadHistory(mHistory);
-                                if(ReturnCode != null)
-                                    Log.d("postMsg", ReturnCode);
-                                return Boolean.parseBoolean(ReturnCode);
-                            }
-
-                            @Override
-                            protected void onPostExecute(final Boolean success) {
-                                super.onPostExecute(success);
-                                mPDialog.dismiss();
-                                if (success) {
-                                    Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
-                                } else {
-                                    Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+                                String ReturnCode;
+                                @Override
+                                protected Boolean doInBackground(Void... params) {
+                                    ReturnCode = WebService.UploadHistory(mHistory);
+                                    if(ReturnCode != null)
+                                        Log.d("postMsg", ReturnCode);
+                                    return Boolean.parseBoolean(ReturnCode);
                                 }
-                            }
-                        }.execute();
-                    }
-                }.execute();
+
+                                @Override
+                                protected void onPostExecute(final Boolean success) {
+                                    super.onPostExecute(success);
+                                    mPDialog.dismiss();
+                                    if (success) {
+                                        Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+                                    } else {
+                                        Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            }.execute();
+                        }
+                    }.execute();
+                }else{
+                    Toast.makeText(PostMessage.this, "请至少选择一个标签", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -198,7 +203,9 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
     public void onSelected(Set<Integer> selectPosSet) {
         String tags = "";
         Object[] id = selectPosSet.toArray();
-        tags = mNames[Integer.valueOf(id[0].toString())];
+        if(id.length > 0){
+            tags = mNames[Integer.valueOf(id[0].toString())];
+        }
         for (int i = 1; i < id.length; i++) {
             tags += "/" + mNames[Integer.valueOf(id[i].toString())];
         }

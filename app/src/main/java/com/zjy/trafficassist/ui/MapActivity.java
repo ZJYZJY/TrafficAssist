@@ -3,6 +3,7 @@ package com.zjy.trafficassist.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -39,19 +40,33 @@ import com.amap.api.maps.model.CircleOptions;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.nearby.NearbyInfo;
+import com.amap.api.services.nearby.NearbySearch;
+import com.amap.api.services.nearby.NearbySearch.NearbyQuery;
+import com.amap.api.services.nearby.NearbySearchFunctionType;
+import com.amap.api.services.nearby.NearbySearchResult;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.WebService;
+import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.SensorEventHelper;
+
+import static com.zjy.trafficassist.UserStatus.Login_status;
+import static com.zjy.trafficassist.UserStatus.editor;
+import static com.zjy.trafficassist.UserStatus.first_show;
+import static com.zjy.trafficassist.UserStatus.sp;
+import static com.zjy.trafficassist.UserStatus.user;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        LocationSource, AMapLocationListener, View.OnClickListener {
+        LocationSource, AMapLocationListener, View.OnClickListener, NearbySearch.NearbyListener {
 
     /**
      * 定位圈的颜色
      */
-    private static final int STROKE_COLOR   = Color.argb(180, 3, 145, 255);
-    private static final int FILL_COLOR     = Color.argb(10, 0, 0, 180);
+    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
+    private static final int FILL_COLOR   = Color.argb(10, 0, 0, 180);
 
     private MapView mapView;
     private AMap aMap;
@@ -73,6 +88,8 @@ public class MapActivity extends AppCompatActivity
 
     private long exitTime = 0;
     private boolean mFirstFix = false;
+
+    private UserLoginTask mAuthTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +114,10 @@ public class MapActivity extends AppCompatActivity
         mapView = (MapView) findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         Initial();
+        //获取附近实例
+        NearbySearch PoliceNearbySearch = NearbySearch.getInstance(getApplicationContext());
+        //设置附近监听
+        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -105,6 +126,47 @@ public class MapActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        sp = this.getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        // 自动登录
+        if(sp.getString("USER_NAME", null) != null
+                && sp.getString("PASSWORD", null) != null){
+            user.setUsername(sp.getString("USER_NAME", ""));
+            user.setPassword(sp.getString("PASSWORD", ""));
+            Log.e("sp_userinfo", "sp" + user.getUsername() + user.getPassword());
+
+            mAuthTask = new UserLoginTask();
+            mAuthTask.execute();
+        }
+        // 保存用户名和密码
+        if(UserStatus.user != null){
+            editor = sp.edit();
+            editor.putString("USER_NAME", user.getUsername());
+            editor.putString("PASSWORD", user.getPassword());
+            editor.commit();
+        }
+
+        new AsyncTask<Void, Void, Boolean>(){
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String result;
+                result = WebService.Login(user.getUsername(), user.getPassword());
+                return Boolean.parseBoolean(result);
+            }
+            @Override
+
+            protected void onPostExecute(final Boolean success) {
+
+                if (success) {
+                    Login_status = true;
+                } else {
+                    Login_status = false;
+                    Toast.makeText(MapActivity.this, "账户信息有误，请重新登录", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                }
+            }
+        };
     }
 
     /**
@@ -197,9 +259,11 @@ public class MapActivity extends AppCompatActivity
     public void onLocationChanged(AMapLocation amapLocation) {
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-                // 显示系统小蓝点
-//                mListener.onLocationChanged(amapLocation);
+                //显示系统小蓝点
+                //mListener.onLocationChanged(amapLocation);
                 location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
+                //搜索附近的交警信息
+                NearbySearchCondition();
                 if(UserStatus.user != null) {
                     UserStatus.user.setLocation(location);
                 }
@@ -283,7 +347,7 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //侧边导航栏按键监听事件
         int id = item.getItemId();
-        if(UserStatus.Login_status) {
+        if(Login_status) {
             if (id == R.id.user_info) {
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
             } else if (id == R.id.alarm_history) {
@@ -310,7 +374,7 @@ public class MapActivity extends AppCompatActivity
         //主界面按钮监听事件
         switch (v.getId()) {
             case R.id.fab_post:
-                if(UserStatus.Login_status)
+                if(Login_status)
                     startActivity(new Intent(MapActivity.this, PostMessage.class));
                 else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
@@ -330,7 +394,7 @@ public class MapActivity extends AppCompatActivity
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 按下键盘上返回按钮出现退出提示
         if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
-            if((System.currentTimeMillis()-exitTime) > 2000){
+            if((System.currentTimeMillis() - exitTime) > 2000){
                 Toast.makeText(MapActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
@@ -347,13 +411,13 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if (UserStatus.Login_status && UserStatus.first_show) {
+        if (Login_status && first_show) {
             Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-            display_user_name.setText(UserStatus.user.getUsername());
-            UserStatus.first_show = false;
+            display_user_name.setText(user.getUsername());
+            first_show = false;
         }
-        logined.setVisibility(UserStatus.Login_status ? View.VISIBLE : View.GONE);
-        unlogin.setVisibility(UserStatus.Login_status ? View.GONE : View.VISIBLE);
+        logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
+        unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
         if (mSensorHelper == null) {
             mSensorHelper = new SensorEventHelper(this);
         }
@@ -376,6 +440,109 @@ public class MapActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if(null != mlocationClient){
+            mlocationClient.onDestroy();
+        }
+        NearbySearch.destroy();
         android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    //设置搜索条件
+    public void NearbySearchCondition(){
+        NearbyQuery query = new NearbyQuery();
+        //设置搜索的中心点
+        query.setCenterPoint(new LatLonPoint(location.latitude, location.longitude));
+        //设置搜索的坐标体系
+        query.setCoordType(NearbySearch.AMAP);
+        //设置搜索半径
+        query.setRadius(5000);
+        //设置查询的时间
+        query.setTimeRange(10000);
+        //设置查询的方式驾车还是距离
+        query.setType(NearbySearchFunctionType.DRIVING_DISTANCE_SEARCH);
+        //调用异步查询接口
+        NearbySearch.getInstance(getApplicationContext())
+                .searchNearbyInfoAsyn(query);
+    }
+
+    @Override
+    public void onUserInfoCleared(int i) {
+
+    }
+
+    @Override
+    public void onNearbyInfoSearched(NearbySearchResult nearbySearchResult, int i) {
+    //搜索周边附近用户回调处理
+        if(i == 1000){
+            if (nearbySearchResult != null
+                    && nearbySearchResult.getNearbyInfoList() != null
+                    && nearbySearchResult.getNearbyInfoList().size() > 0) {
+                NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
+                Log.e("NearbySearchResult",
+                        "周边搜索结果为size " + nearbySearchResult.getNearbyInfoList().size() +
+                                " first："+ nearbyInfo.getUserID() + "  " +
+                                nearbyInfo.getDistance()+ "  " +
+                                nearbyInfo.getDrivingDistance() + "  " +
+                                nearbyInfo.getTimeStamp() + "  " +
+                                nearbyInfo.getPoint().toString());
+            } else {
+                Log.e("NearbySearchResult", "周边搜索结果为空");
+            }
+        }
+        else{
+            Log.e("NearbySearchResult", "周边搜索出现异常，异常码为："+ i);
+        }
+    }
+
+    @Override
+    public void onNearbyInfoUploaded(int i) {
+
+    }
+
+    /**
+     * 后台线程进行登陆操作
+     * @ReturnCode String "true" or "false"
+     */
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+
+        private String ReturnCode;
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            try {
+                // Simulate network access.
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                return false;
+            }
+            ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
+            System.out.println(ReturnCode);
+            return Boolean.parseBoolean(ReturnCode);
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+
+            if (success) {
+                Login_status = true;
+                if (first_show) {
+                    Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
+                    display_user_name.setText(user.getUsername());
+                    first_show = false;
+                }
+                logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
+                unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
+            } else {
+                Toast.makeText(MapActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+        }
     }
 }

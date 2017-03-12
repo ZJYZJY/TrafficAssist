@@ -46,7 +46,7 @@ public class TransForm {
                 String str_acctag = (String) each_item.get("detail");
                 JSONArray filenames = each_item.getJSONArray("fileNames");
                 for(int j = 0; j < filenames.length(); j++) {
-                    bitmaps.add(WebService.getLocalOrNetBitmap("http://192.168.31.100/TrafficAssist/AccidentImage/" + filenames.get(j)));
+                    bitmaps.add(WebService.getLocalOrNetBitmap("http://120.27.130.203:8001/trafficassist/AccidentImage/" + filenames.get(j)));
                 }
                 alarmHistories.add(new AlarmHistory(
                         str_acctag,

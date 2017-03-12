@@ -79,7 +79,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
         mPasswordView = (EditText) findViewById(R.id.password);
 
-        mSignup = (TextView) findViewById(R.id.sign_up);
+        mSignup = (TextView) findViewById(R.id.user_sign_up);
         TextPaint tp0 = mSignup.getPaint();
         tp0.setFakeBoldText(true);
         mSignup.setOnClickListener(new OnClickListener() {
@@ -93,22 +93,18 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         mForgetpassword = (TextView) findViewById(R.id.forget_password);
         TextPaint tp1 = mForgetpassword.getPaint();
         tp1.setFakeBoldText(true);
-        mForgetpassword.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "数据库有" + DBManager.getUserCount()
-                        + "条数据", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        mForgetpassword.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(LoginActivity.this, "数据库有" + DBManager.getUserCount()
+//                        + "条数据", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
-        mUserSignInButton = (Button) findViewById(R.id.user_sign_in_button);
+        mUserSignInButton = (Button) findViewById(R.id.user_sign_in);
         mUserSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                InputMethodManager m = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if(m.isActive()){
-                    m.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                }
                 attemptLogin();
             }
         });
@@ -214,6 +210,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             mPDialog.show();
             mAuthTask = new UserLoginTask();
             mAuthTask.execute();
+//            mPDialog.dismiss();
         }
     }
 
@@ -311,6 +308,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 UserStatus.Login_status = true;
                 UserStatus.user = user;
                 finish();
+                startActivity(new Intent(LoginActivity.this, MapActivity.class));
             } else {
                 Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

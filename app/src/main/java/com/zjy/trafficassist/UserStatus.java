@@ -1,5 +1,7 @@
 package com.zjy.trafficassist;
 
+import android.content.SharedPreferences;
+
 import com.zjy.trafficassist.model.User;
 
 /**
@@ -10,9 +12,9 @@ import com.zjy.trafficassist.model.User;
  */
 public class UserStatus {
 
-//    public static boolean Login_status = false;
-//    public static User user;
-    public static boolean Login_status = true;
-    public static User user = new User("15158266502", "zjyzjy123");
+    public static boolean Login_status = false;
+    public static User user = new User();
     public static boolean first_show = true;
+    public static SharedPreferences sp;
+    public static SharedPreferences.Editor editor;
 }
