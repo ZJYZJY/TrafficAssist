@@ -29,10 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import me.iwf.photopicker.widget.MultiPickResultView;
 

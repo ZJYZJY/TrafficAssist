@@ -30,7 +30,7 @@
 
         <com.zjy.trafficassist.widget.tagFlow.TagFlowLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="200dp"
             android:layout_marginTop="10dp"
             app:max_select="-1"
             android:id="@+id/tag_flow"/>

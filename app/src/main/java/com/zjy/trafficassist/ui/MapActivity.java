@@ -46,11 +46,19 @@ import com.amap.api.services.nearby.NearbySearch;
 import com.amap.api.services.nearby.NearbySearch.NearbyQuery;
 import com.amap.api.services.nearby.NearbySearchFunctionType;
 import com.amap.api.services.nearby.NearbySearchResult;
+import com.zjy.trafficassist.App;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.WebService;
 import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.SensorEventHelper;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.rong.imkit.RongIM;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
 
 import static com.zjy.trafficassist.UserStatus.Login_status;
 import static com.zjy.trafficassist.UserStatus.editor;
@@ -88,6 +96,7 @@ public class MapActivity extends AppCompatActivity
 
     private long exitTime = 0;
     private boolean mFirstFix = false;
+    private Map<String, Boolean> supportConversation = new HashMap<>();
 
     private UserLoginTask mAuthTask;
 
@@ -117,7 +126,12 @@ public class MapActivity extends AppCompatActivity
         //获取附近实例
         NearbySearch PoliceNearbySearch = NearbySearch.getInstance(getApplicationContext());
         //设置附近监听
-        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
+        PoliceNearbySearch.addNearbyListener(this);
+//        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
+
+        connectIMServer("bDIjjHtLja1iRktPqjHfwdMnhDhvzg9jRuzXf1Haw/6PfyKlZHV1m/1pMTwBCa0sZanUGmejRpJ73wRgY7uc/Q==");
+        // 设置支持聊天信息的类型
+        supportConversation.put(Conversation.ConversationType.PRIVATE.getName(), false);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -146,27 +160,27 @@ public class MapActivity extends AppCompatActivity
             editor.commit();
         }
 
-        new AsyncTask<Void, Void, Boolean>(){
-
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                String result;
-                result = WebService.Login(user.getUsername(), user.getPassword());
-                return Boolean.parseBoolean(result);
-            }
-            @Override
-
-            protected void onPostExecute(final Boolean success) {
-
-                if (success) {
-                    Login_status = true;
-                } else {
-                    Login_status = false;
-                    Toast.makeText(MapActivity.this, "账户信息有误，请重新登录", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
-                }
-            }
-        };
+//        new AsyncTask<Void, Void, Boolean>(){
+//
+//            @Override
+//            protected Boolean doInBackground(Void... params) {
+//                String result;
+//                result = WebService.Login(user.getUsername(), user.getPassword());
+//                return Boolean.parseBoolean(result);
+//            }
+//            @Override
+//
+//            protected void onPostExecute(final Boolean success) {
+//
+//                if (success) {
+//                    Login_status = true;
+//                } else {
+//                    Login_status = false;
+//                    Toast.makeText(MapActivity.this, "账户信息有误，请重新登录", Toast.LENGTH_SHORT).show();
+//                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
+//                }
+//            }
+//        };
     }
 
     /**
@@ -361,7 +375,10 @@ public class MapActivity extends AppCompatActivity
         }
         if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.nav_about) {
+        } else if (id == R.id.nav_chat) {
+            RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
+        } else if(id == R.id.nav_about){
+
 //            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
 //                    + "条数据", Toast.LENGTH_SHORT).show();
         }
@@ -411,11 +428,11 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if (Login_status && first_show) {
-            Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-            display_user_name.setText(user.getUsername());
-            first_show = false;
-        }
+//        if (Login_status && first_show) {
+//            Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
+//            display_user_name.setText(user.getUsername());
+//            first_show = false;
+//        }
         logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
         unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
         if (mSensorHelper == null) {
@@ -497,6 +514,43 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onNearbyInfoUploaded(int i) {
 
+    }
+
+    public void connectIMServer(String token) {
+
+        if (getApplicationInfo().packageName.equals(App.getCurProcessName(getApplicationContext()))) {
+
+            RongIM.connect(token, new RongIMClient.ConnectCallback() {
+
+                /**
+                 * Token 错误。可以从下面两点检查 1.  Token 是否过期，如果过期您需要向 App Server 重新请求一个新的 Token
+                 *                  2.  token 对应的 appKey 和工程里设置的 appKey 是否一致
+                 */
+                @Override
+                public void onTokenIncorrect() {
+                    Log.d("LoginActivity", "--onTokenIncorrect--");
+                }
+
+                /**
+                 * 连接融云成功
+                 * @param userid 当前 token 对应的用户 id
+                 */
+                @Override
+                public void onSuccess(String userid) {
+                    Log.d("LoginActivity", "--onSuccess--" + userid);
+                    Toast.makeText(MapActivity.this, userid + " 登陆成功", Toast.LENGTH_SHORT).show();
+                }
+
+                /**
+                 * 连接融云失败
+                 * @param errorCode 错误码，可到官网 查看错误码对应的注释
+                 */
+                @Override
+                public void onError(RongIMClient.ErrorCode errorCode) {
+                    Log.d("LoginActivity", "--onError--" + errorCode);
+                }
+            });
+        }
     }
 
     /**
