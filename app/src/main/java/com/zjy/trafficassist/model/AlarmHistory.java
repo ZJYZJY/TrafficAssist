@@ -18,6 +18,7 @@ public class AlarmHistory {
     private String username;
     private String accidentTags;
     private ArrayList<Bitmap> pictures;
+    private ArrayList<String> picUrl;
     private ArrayList<File> files;
     private LatLng location;
 
@@ -30,9 +31,9 @@ public class AlarmHistory {
 
     // 用于构造
     public AlarmHistory(String accidentTags, String nickname,
-                        String username, ArrayList<Bitmap> pictures) {
+                        String username, ArrayList<String> picUrl) {
         this(accidentTags, nickname, username);
-        this.pictures = pictures;
+        this.picUrl = picUrl;
     }
 
     // 用于构造上传时的数据
@@ -69,6 +70,14 @@ public class AlarmHistory {
 
     public LatLng getLocation() {
         return location;
+    }
+
+    public ArrayList<String> getPicUrl() {
+        return picUrl;
+    }
+
+    public void setPicUrl(ArrayList<String> picUrl) {
+        this.picUrl = picUrl;
     }
 
     public int getId() {

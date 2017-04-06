@@ -12,6 +12,7 @@ import java.util.ArrayList;
 /**
  * Created by ZJY on 2016/4/14.
  */
+@Deprecated
 public class DatabaseManager {
 
     private DatabaseHelper helper;

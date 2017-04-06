@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.utils.LogUtil;
 
 import java.util.ArrayList;
 
@@ -38,8 +40,13 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         holder.text_id.setText("ID：" + String.valueOf(getItemId(position) + 1));
         holder.text_username.setText("用户名：" + alarmHistories.get(position).getUsername());
         holder.text_acctag.setText("详情：" + alarmHistories.get(position).getaccidentTags());
-        if(alarmHistories.get(position).getPictures() != null)
-            holder.his_pic.setImageBitmap(alarmHistories.get(position).getPictures().get(0));
+        if(alarmHistories.get(position).getPicUrl() != null && alarmHistories.get(position).getPicUrl().size() > 0){
+            Glide.with(mContext)
+                    .load(alarmHistories.get(position).getPicUrl().get(0))
+                    .centerCrop()
+                    .placeholder(R.mipmap.ic_launcher)
+                    .into(holder.his_pic);
+        }
     }
 
     @Override
