@@ -16,18 +16,44 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.zjy.trafficassist.*;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.TransForm;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import me.iwf.photopicker.widget.MultiPickResultView;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
 public class PostMessage extends BaseActivity {
 
@@ -84,48 +110,124 @@ public class PostMessage extends BaseActivity {
                     accidentTags = btn1.getText().toString() + "/" + btn2.getText().toString() + "/" + btn3.getText().toString();
                     LogUtil.e(accidentTags);
                     final ArrayList<String> paths = recyclerView.getPhotos();
-                    new AsyncTask<Void, Void, Void>() {
+
+//                    new AsyncTask<Void, Void, Void>() {
+//                        @Override
+//                        protected Void doInBackground(Void... params) {
+//                            // 获取选择的图片对应的File对象
+//                            imgFiles = getImageFiles(paths);
+//                            mHistory = new AlarmHistory(
+//                                    accidentTags,
+//                                    UserStatus.USER.getNickname(),
+//                                    UserStatus.USER.getUsername(),
+//                                    imgFiles,
+//                                    UserStatus.USER.getLocation());
+//                            Log.d("accTags", accidentTags);
+//                            return null;
+//                        }
+//
+//                        @Override
+//                        protected void onPostExecute(Void aVoid) {
+//                            super.onPostExecute(aVoid);
+//                            new AsyncTask<Void, Void, Boolean>() {
+//
+//                                String ReturnCode;
+//                                @Override
+//                                protected Boolean doInBackground(Void... params) {
+//                                    ReturnCode = WebService.UploadHistory(mHistory);
+//                                    if(ReturnCode != null)
+//                                        Log.d("postMsg", ReturnCode);
+//                                    return Boolean.parseBoolean(ReturnCode);
+//                                }
+//
+//                                @Override
+//                                protected void onPostExecute(final Boolean success) {
+//                                    super.onPostExecute(success);
+//                                    mPDialog.dismiss();
+//                                    if (success) {
+//                                         Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+//                                    } else {
+//                                        Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+//                                    }
+//                                }
+//                            }.execute();
+//                        }
+//                    }.execute();
+
+                    imgFiles = getImageFiles(paths);
+                    String NamesString = imgFiles.get(0).getName();
+                    for(int i = 1; i < imgFiles.size(); i++) {
+                        NamesString += "/" + imgFiles.get(i).getName();
+                    }
+                    List<MultipartBody.Part> parts = HttpUtil.files2Parts("image", paths);
+                    HttpUtil.addTextPart(parts, "accidentTags", accidentTags, parts.size());
+                    HttpUtil.addTextPart(parts, "nickname", USER.getNickname(), parts.size());
+                    HttpUtil.addTextPart(parts, "username", USER.getUsername(), parts.size());
+                    HttpUtil.addTextPart(parts, "longitude", USER.getLocation().longitude+"", parts.size());
+                    HttpUtil.addTextPart(parts, "latitude", USER.getLocation().latitude+"", parts.size());
+                    HttpUtil.addTextPart(parts, "filenames", NamesString, parts.size());
+//                    HttpUtil.create().uploadHistory(parts, historyInfo).enqueue(new Callback<ResponseBody>() {
+                    HttpUtil.create().uploadHistory(parts).enqueue(new Callback<ResponseBody>() {
                         @Override
-                        protected Void doInBackground(Void... params) {
-                            // 获取选择的图片对应的File对象
-                            imgFiles = getImageFiles(paths);
-                            mHistory = new AlarmHistory(
-                                    accidentTags,
-                                    UserStatus.USER.getNickname(),
-                                    UserStatus.USER.getUsername(),
-                                    imgFiles,
-                                    UserStatus.USER.getLocation());
-                            Log.d("accTags", accidentTags);
-                            return null;
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            try {
+                                String res = response.body().string();
+                                JSONObject json = new JSONObject(res);
+                                if(HttpUtil.stateCode(res) == SUCCESS){
+                                    Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+                                }else {
+                                    Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException | IOException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
-                        protected void onPostExecute(Void aVoid) {
-                            super.onPostExecute(aVoid);
-                            new AsyncTask<Void, Void, Boolean>() {
-
-                                String ReturnCode;
-                                @Override
-                                protected Boolean doInBackground(Void... params) {
-                                    ReturnCode = WebService.UploadHistory(mHistory);
-                                    if(ReturnCode != null)
-                                        Log.d("postMsg", ReturnCode);
-                                    return Boolean.parseBoolean(ReturnCode);
-                                }
-
-                                @Override
-                                protected void onPostExecute(final Boolean success) {
-                                    super.onPostExecute(success);
-                                    mPDialog.dismiss();
-                                    if (success) {
-                                         Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
-                                    } else {
-                                        Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
-                                    }
-                                }
-                            }.execute();
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Snackbar.make(container, "连接失败", Snackbar.LENGTH_LONG).show();
                         }
-                    }.execute();
+                    });
+
+//                    imgFiles = getImageFiles(paths);
+//                    String NamesString = imgFiles.get(0).getName();
+//                    for(int i = 1; i < imgFiles.size(); i++) {
+//                        NamesString += "/" + imgFiles.get(i).getName();
+//                    }
+//                    Map<String, RequestBody> photos = new HashMap<>();
+//                    Map<String, String> historyInfo = new HashMap<>();
+//                    historyInfo.put("accidentTags", accidentTags);
+//                    historyInfo.put("nickname", USER.getNickname());
+//                    historyInfo.put("username", USER.getUsername());
+//                    historyInfo.put("longitude", USER.getLocation().longitude+"");
+//                    historyInfo.put("latitude", USER.getLocation().latitude+"");
+//                    historyInfo.put("filenames", NamesString);
+//                    for(int i = 0; i < imgFiles.size(); i++){
+//                        File file = imgFiles.get(i);
+//                        RequestBody photoRequestBody = RequestBody.create(MediaType.parse("image/png"), file);
+//                        photos.put("image", photoRequestBody);
+//                    }
+//                    HttpUtil.create().uploadHistory(photos, historyInfo).enqueue(new Callback<ResponseBody>() {
+//                        @Override
+//                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                            try {
+//                                String res = response.body().string();
+//                                JSONObject json = new JSONObject(res);
+//                                if(HttpUtil.stateCode(res) == SUCCESS){
+//                                    Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+//                                }else {
+//                                    Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
+//                                }
+//                            } catch (JSONException | IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                            Snackbar.make(container, "连接失败", Snackbar.LENGTH_LONG).show();
+//                        }
+//                    });
                 }else{
                     Toast.makeText(PostMessage.this, "请完整填写信息", Toast.LENGTH_SHORT).show();
                 }
@@ -140,6 +242,11 @@ public class PostMessage extends BaseActivity {
 
     }
 
+    /**
+     * 将要上传的文件保存到本地临时文件夹
+     * @param paths 图片文件的原始路径
+     * @return imgFiles 转存后的图片文件对象
+     */
     public ArrayList<File> getImageFiles(ArrayList<String> paths) {
         String dir = "/storage/emulated/0/TrafficAssist/uploadTmp/";
         File Dir = new File(dir);

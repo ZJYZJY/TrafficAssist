@@ -4,10 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.helper.DatabaseHelper;
 import com.zjy.trafficassist.model.User;
-
-import java.util.ArrayList;
 
 /**
  * Created by ZJY on 2016/4/14.

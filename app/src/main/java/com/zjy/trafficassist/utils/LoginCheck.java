@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.helper.ConnectIMServerHelper;
 import com.zjy.trafficassist.model.User;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class LoginCheck {
                         // IM服务器登录
                         SharedPreferences preferences = context.getSharedPreferences("RongKitConfig", MODE_PRIVATE);
                         String token = preferences.getString("token", "");
-                        ConnectIMServer.getInstance().connectIMServer(context, token);
+                        ConnectIMServerHelper.getInstance().connectIMServer(context, token);
 
                         Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show();
 

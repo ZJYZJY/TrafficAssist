@@ -26,14 +26,14 @@ import java.util.Date;
 public class TransForm {
 
     // 解析从服务器传回的JSON数据
-    public static ArrayList<AlarmHistory> DownloadHistory(String json)
+    public static ArrayList<AlarmHistory> parseHistory(String json)
             throws UnsupportedEncodingException {
         if (json == null)
             return null;
-        ArrayList<AlarmHistory> alarmHistories = new ArrayList<>();
-        ArrayList<String> picUrl = new ArrayList<>();
-        JSONObject historyInfo = null;
-        JSONObject info = null;
+        ArrayList<AlarmHistory> alarmHistories = new ArrayList<>();;
+        ArrayList<String> picUrl = null;
+        JSONObject historyInfo;
+        JSONObject info;
         try {
             historyInfo = new JSONObject(json);
             info = historyInfo.getJSONObject("info");
@@ -42,8 +42,8 @@ public class TransForm {
                 JSONObject each_item = (JSONObject) histories.get(i);
                 String str_acctag = (String) each_item.get("detail");
                 JSONArray filenames = each_item.getJSONArray("fileNames");
+                picUrl = new ArrayList<>();
                 for (int j = 0; j < filenames.length(); j++) {
-//                    bitmaps.add(WebService.getLocalOrNetBitmap("http://120.27.130.203:8001/trafficassist/AccidentImage/" + filenames.get(j)));
                     picUrl.add("http://120.27.130.203:8001/trafficassist/AccidentImage/" + filenames.get(j));
                 }
                 alarmHistories.add(new AlarmHistory(

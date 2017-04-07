@@ -2,12 +2,9 @@ package com.zjy.trafficassist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -49,13 +46,9 @@ import com.amap.api.services.nearby.NearbySearchFunctionType;
 import com.amap.api.services.nearby.NearbySearchResult;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
-import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.AutoLogin;
-import com.zjy.trafficassist.utils.ConnectIMServer;
 import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.SensorEventHelper;
-import com.zjy.trafficassist.utils.UserLoginTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,9 +57,6 @@ import io.rong.imkit.RongIM;
 import io.rong.imlib.model.Conversation;
 
 import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
-import static com.zjy.trafficassist.UserStatus.EDITOR;
-import static com.zjy.trafficassist.UserStatus.first_show;
-import static com.zjy.trafficassist.UserStatus.SP;
 import static com.zjy.trafficassist.UserStatus.USER;
 
 public class MapActivity extends AppCompatActivity

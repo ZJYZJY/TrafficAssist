@@ -1,33 +1,46 @@
-package com.zjy.trafficassist.utils;
+package com.zjy.trafficassist.helper;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.App;
-import com.zjy.trafficassist.WebService;
+import com.zjy.trafficassist.utils.HttpUtil;
+import com.zjy.trafficassist.utils.LogUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.rong.imkit.RongIM;
 import io.rong.imlib.RongIMClient;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
 /**
  * com.zjy.trafficassist.utils
  * Created by 73958 on 2017/3/21.
  */
 
-public class ConnectIMServer {
+public class ConnectIMServerHelper {
 
     /**
      * 单例模式
      * @return sInstance
      */
-    public static ConnectIMServer getInstance(){
+    public static ConnectIMServerHelper getInstance(){
         return ConnectIMServerHolder.sInstance;
     }
 
     private static class ConnectIMServerHolder{
-        private static final ConnectIMServer sInstance = new ConnectIMServer();
+        private static final ConnectIMServerHelper sInstance = new ConnectIMServerHelper();
     }
 
     public void connectIMServer(final Context context, String token) {
@@ -45,20 +58,31 @@ public class ConnectIMServer {
                 public void onTokenIncorrect() {
                     LogUtil.d("IMServer", "--onTokenIncorrect--");
 
-                    new AsyncTask<Void, Void, String>() {
+                    Map<String, String> user = new HashMap<>();
+                    user.put("username", USER.getUsername());
+                    user.put("tname", USER.getNickname());
+                    HttpUtil.create().getToken(user).enqueue(new Callback<ResponseBody>() {
                         @Override
-                        protected String doInBackground(Void... voids) {
-                            return WebService.getUserIMToken();
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            try {
+                                String res = response.body().string();
+                                if(HttpUtil.stateCode(res) == SUCCESS){
+                                    JSONObject json = new JSONObject(res);
+                                    String token = json.getString("token");
+                                    ConnectIMServerHelper.getInstance().connectIMServer(context, token);
+                                    LogUtil.d("token from server:" + token);
+                                }
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                                LogUtil.e("Exception"+e.toString());
+                            }
                         }
 
                         @Override
-                        protected void onPostExecute(String token) {
-                            super.onPostExecute(token);
-                            if(token != null)
-                                ConnectIMServer.getInstance().connectIMServer(context, token);
-                            LogUtil.d("token from server:" + token);
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast.makeText(context, "连接失败", Toast.LENGTH_SHORT).show();
                         }
-                    }.execute();
+                    });
                 }
 
                 /**

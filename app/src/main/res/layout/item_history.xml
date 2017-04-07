@@ -6,7 +6,6 @@
     android:layout_marginTop="8dp"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
-    android:layout_marginBottom="8dp"
     android:orientation="vertical"
     card_view:cardBackgroundColor="@color/cardview_shadow_end_color">
 

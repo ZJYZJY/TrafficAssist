@@ -42,18 +42,10 @@ public class WebService {
     /**
      * 与HTTP服务器通信，进行登录
      */
+    @Deprecated
     public static String Login(User user) {
         path = "http://" + server_IP + "/trafficassist/userApi/login.php";
         path = path + "?username=" + user.getUsername() + "&password=" + user.getPassword();
-        return Connect();
-    }
-
-    /**
-     * 与HTTP服务器通信，进行注册
-     */
-    public static String Register(String username, String password) {
-        path = "http://" + server_IP + "/trafficassist/userApi/register.php";
-        path = path + "?username=" + username + "&password=" + password;
         return Connect();
     }
 
@@ -195,57 +187,6 @@ public class WebService {
             }
         }
         return null;
-    }
-
-    /**
-     * 与HTTP服务器通信，获取报警信息到本地
-     */
-    public static String DownloadHistory() {
-        path = "http://" + server_IP + "/trafficassist/userApi/downloadHistory.php";
-        path = path + "?username=" + UserStatus.USER.getUsername();
-        return Connect();
-    }
-
-    /**
-     * 服务器向融云服务器请求Token，返回到本地
-     * @return token
-     */
-    public static String getUserIMToken() {
-        path = "http://" + server_IP + "/trafficassist/IMServerApi/getToken.php";
-        path = path + "?username=" + UserStatus.USER.getUsername() + "&tname=" + UserStatus.USER.getNickname();
-        JSONObject json = null;
-        try {
-            json = new JSONObject(Connect());
-            return json.getString("token");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Bitmap getLocalOrNetBitmap(String url) {
-        int IO_BUFFER_SIZE = 2*1024;
-        Bitmap bitmap = null;
-        InputStream in = null;
-        BufferedOutputStream out = null;
-        try
-        {
-            in = new BufferedInputStream(new URL(url).openStream(), IO_BUFFER_SIZE);
-            final ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-            out = new BufferedOutputStream(dataStream, IO_BUFFER_SIZE);
-            byte[] b = new byte[IO_BUFFER_SIZE];
-            int read;
-            while ((read = in.read(b)) != -1)
-                out.write(b, 0, read);
-            out.flush();
-            byte[] data = dataStream.toByteArray();
-            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            data = null;
-            return bitmap;
-        }catch (IOException e){
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private static String Connect() {

@@ -1,27 +1,23 @@
 package com.zjy.trafficassist.ui;
 
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.BaseActivity;
-import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.adapter.HistoryListAdapter;
+import com.zjy.trafficassist.helper.RecycleViewDivider;
+import com.zjy.trafficassist.listener.RecyclerItemClickListener;
 import com.zjy.trafficassist.utils.HttpUtil;
-import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.TransForm;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.WebService;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +30,7 @@ import static com.zjy.trafficassist.UserStatus.USER;
 import static com.zjy.trafficassist.utils.HttpUtil.EMPTY;
 import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
-public class AlarmHistory extends BaseActivity {
+public class AlarmHistory extends BaseActivity implements RecyclerItemClickListener {
 
 
     private static boolean FROM_INTERNET;
@@ -44,7 +40,7 @@ public class AlarmHistory extends BaseActivity {
     private ArrayList<com.zjy.trafficassist.model.AlarmHistory> internet_history;
     private HistoryListAdapter historyListAdapter;
     private SwipeRefreshLayout RefreshLayout;
-    private DatabaseManager databaseManager;
+//    private DatabaseManager databaseManager;
 
 
     @Override
@@ -65,17 +61,11 @@ public class AlarmHistory extends BaseActivity {
         historyList.setLayoutManager(new LinearLayoutManager(this));    //设置LinearLayoutManager
         historyList.setItemAnimator(new DefaultItemAnimator());         //设置ItemAnimator
         historyList.setHasFixedSize(true);                              //设置固定大小
+//        historyList.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager.VERTICAL,
+//                16, getResources().getColor(R.color.WHITE)));
 
         FROM_INTERNET = true;
-//        internet_history = getListItem();
-//        local_history = getListItem();
         getListItem();
-        /**
-         * 创建适配器
-         */
-//        historyListAdapter = new HistoryListAdapter(this, local_history);
-//        historyListAdapter = new HistoryListAdapter(this, internet_history);
-//        historyList.setAdapter(historyListAdapter);
 
         RefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -98,12 +88,13 @@ public class AlarmHistory extends BaseActivity {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
                         String res = response.body().string();
-                        List<com.zjy.trafficassist.model.AlarmHistory> list = TransForm.DownloadHistory(res);
+                        List<com.zjy.trafficassist.model.AlarmHistory> list = TransForm.parseHistory(res);
                         if(HttpUtil.stateCode(res) == SUCCESS){
                             for (int i = 0; i < list.size(); i++) {
                                 history_item.add(list.get(i));
                             }
                             historyListAdapter = new HistoryListAdapter(AlarmHistory.this, history_item);
+                            historyListAdapter.setOnRecyclerItemClickListener(AlarmHistory.this);
                             historyList.setAdapter(historyListAdapter);
                             historyListAdapter.notifyDataSetChanged();
                         }else if(HttpUtil.stateCode(res) == EMPTY){
@@ -120,8 +111,11 @@ public class AlarmHistory extends BaseActivity {
                 }
             });
         }
-//        databaseManager.SaveHistory(item_history);
-//        return history_item;
+    }
+
+    @Override
+    public void onItemClick(View view, int postion) {
+        Toast.makeText(this, "点击了 " + postion, Toast.LENGTH_SHORT).show();
     }
 
     @Override

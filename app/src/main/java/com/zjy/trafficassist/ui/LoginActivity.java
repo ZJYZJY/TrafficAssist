@@ -27,7 +27,7 @@ public class LoginActivity extends BaseActivity {
 
     private UserLoginTask mAuthTask;
     private User user;
-    private DatabaseManager DBManager;
+//    private DatabaseManager DBManager;
 
     // UI references.
     private EditText mUsernameView;

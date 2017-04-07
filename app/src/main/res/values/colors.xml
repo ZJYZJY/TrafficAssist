@@ -7,4 +7,5 @@
 
     <color name="fadePanel">#2e2e2e</color>
     <color name="tag_select_textcolor">#FFffffff</color>
+    <color name="WHITE">#ffffff</color>
 </resources>

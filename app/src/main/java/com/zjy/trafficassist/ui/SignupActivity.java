@@ -34,7 +34,7 @@ import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
 public class SignupActivity extends BaseActivity {
 
-    private DatabaseManager DBManager;
+//    private DatabaseManager DBManager;
     private User user;
 
     private CoordinatorLayout container;
@@ -63,7 +63,7 @@ public class SignupActivity extends BaseActivity {
                 attemptSignUp();
             }
         });
-        DBManager = new DatabaseManager(this);
+//        DBManager = new DatabaseManager(this);
     }
 
     private void attemptSignUp(){
@@ -106,31 +106,6 @@ public class SignupActivity extends BaseActivity {
             mPDialog.setMessage(getResources().getString(R.string.now_user_register));
             mPDialog.setCancelable(true);
             mPDialog.show();
-//            new AsyncTask<Void, Void, Boolean>(){
-//                String ReturnCode;
-//
-//                @Override
-//                protected Boolean doInBackground(Void... params) {
-//                    ReturnCode = WebService.Register(user.getUsername(), user.getPassword());
-//                    System.out.println(ReturnCode);
-//                    return Boolean.parseBoolean(ReturnCode);
-//                }
-//
-//                @Override
-//                protected void onPostExecute(final Boolean success) {
-//                    super.onPostExecute(success);
-//                    mPDialog.dismiss();
-//                    if (success) {
-//                        Toast.makeText(SignupActivity.this, "注册成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
-//                        UserStatus.LOGIN_STATUS = true;
-//                        UserStatus.USER = user;
-//                        finish();
-//                        startActivity(new Intent(SignupActivity.this, MapActivity.class));
-//                    } else {
-//                        Toast.makeText(SignupActivity.this, "注册失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            }.execute();
             HttpUtil.create().signup(user).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
