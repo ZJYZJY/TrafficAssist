@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by ZJY on 2016/4/12.
  */
+@Deprecated
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "mydata1.db";//数据库名称

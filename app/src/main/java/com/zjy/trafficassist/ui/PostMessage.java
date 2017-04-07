@@ -1,7 +1,6 @@
 package com.zjy.trafficassist.ui;
 
 import android.app.ProgressDialog;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
@@ -10,54 +9,48 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.TransForm;
-import com.zjy.trafficassist.widget.tagFlow.FlowLayout;
-import com.zjy.trafficassist.widget.tagFlow.TagAdapter;
-import com.zjy.trafficassist.widget.tagFlow.TagFlowLayout;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Set;
 
 import me.iwf.photopicker.widget.MultiPickResultView;
 
-public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClickListener, TagFlowLayout.OnSelectListener {
+public class PostMessage extends BaseActivity {
 
     private Button btn_commit;
     private Uri imageUri;
     private Bitmap bitmap;
     private File imgFile;
     private ArrayList<File> imgFiles;
+
     //Snackbar的容器
     private CoordinatorLayout container;
+    private RadioGroup tag_car_type;
+    private RadioGroup tag_people_effect;
+    private RadioGroup tag_car_crash;
 
     /**
      * 自定义组件
      */
-    private TagFlowLayout mTagFlowLayout;
     private MultiPickResultView recyclerView;
 
     private AlarmHistory mHistory;
 
     private String accidentTags = "";
-    private String mNames[] = {
-            "轻微擦碰","人员受伤","人员死亡",
-            "不影响交通","造成交通堵塞","追尾事故",
-            "有危险品车","酒后驾驶","无证驾驶",
-            "事故责任清晰"
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,19 +60,9 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
 
         container = (CoordinatorLayout) findViewById(R.id.post_container);
         btn_commit = (Button) findViewById(R.id.btn_commit);
-        mTagFlowLayout = (TagFlowLayout) findViewById(R.id.tag_flow);
-        mTagFlowLayout.setOnTagClickListener(this);
-        mTagFlowLayout.setOnSelectListener(this);
-        final LayoutInflater mInflater = LayoutInflater.from(this);
-        mTagFlowLayout.setAdapter(new TagAdapter<String>(mNames) {
-            @Override
-            public View getView(FlowLayout parent, int position, String s) {
-                TextView tv = (TextView) mInflater.inflate(R.layout.item_tag,
-                        mTagFlowLayout, false);
-                tv.setText(s);
-                return tv;
-            }
-        });
+        tag_car_type = (RadioGroup) findViewById(R.id.tag_car_type);
+        tag_people_effect = (RadioGroup) findViewById(R.id.tag_people_effect);
+        tag_car_crash = (RadioGroup) findViewById(R.id.tag_car_crash);
 
         recyclerView = (MultiPickResultView) findViewById(R.id.image_picker);
         recyclerView.init(this, MultiPickResultView.ACTION_SELECT, null);
@@ -87,12 +70,19 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!accidentTags.equals("")){
+                if(tag_car_type.getCheckedRadioButtonId() != -1
+                        && tag_people_effect.getCheckedRadioButtonId() != -1
+                        && tag_car_crash.getCheckedRadioButtonId() != -1){
                     final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
                     mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     mPDialog.setMessage(getResources().getString(R.string.now_upload_history));
                     mPDialog.setCancelable(true);
                     mPDialog.show();
+                    RadioButton btn1 = (RadioButton) findViewById(tag_car_type.getCheckedRadioButtonId());
+                    RadioButton btn2 = (RadioButton) findViewById(tag_people_effect.getCheckedRadioButtonId());
+                    RadioButton btn3 = (RadioButton) findViewById(tag_car_crash.getCheckedRadioButtonId());
+                    accidentTags = btn1.getText().toString() + "/" + btn2.getText().toString() + "/" + btn3.getText().toString();
+                    LogUtil.e(accidentTags);
                     final ArrayList<String> paths = recyclerView.getPhotos();
                     new AsyncTask<Void, Void, Void>() {
                         @Override
@@ -101,10 +91,10 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
                             imgFiles = getImageFiles(paths);
                             mHistory = new AlarmHistory(
                                     accidentTags,
-                                    UserStatus.user.getNickname(),
-                                    UserStatus.user.getUsername(),
+                                    UserStatus.USER.getNickname(),
+                                    UserStatus.USER.getUsername(),
                                     imgFiles,
-                                    UserStatus.user.getLocation());
+                                    UserStatus.USER.getLocation());
                             Log.d("accTags", accidentTags);
                             return null;
                         }
@@ -128,7 +118,7 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
                                     super.onPostExecute(success);
                                     mPDialog.dismiss();
                                     if (success) {
-                                        Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
+                                         Snackbar.make(container, "报警成功", Snackbar.LENGTH_LONG).show();
                                     } else {
                                         Snackbar.make(container, "报警失败", Snackbar.LENGTH_LONG).show();
                                     }
@@ -137,7 +127,7 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
                         }
                     }.execute();
                 }else{
-                    Toast.makeText(PostMessage.this, "请至少选择一个标签", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostMessage.this, "请完整填写信息", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -148,8 +138,6 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
         super.onActivityResult(requestCode, resultCode, data);
         recyclerView.onActivityResult(requestCode,resultCode,data);
 
-//        // 获取选择的图片对应的File对象
-//        imgFiles = getImageFiles(recyclerView.getPhotos());
     }
 
     public ArrayList<File> getImageFiles(ArrayList<String> paths) {
@@ -162,7 +150,6 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
 
         for(int i = 0; i < paths.size(); i++) {
             imgFiles.add(new File(dir + TransForm.DateFileName("IMG") + ".jpg"));
-//            compedBitmaps.add(TransForm.compressImage(BitmapFactory.decodeFile(paths.get(i))));
             compedBitmaps.add(TransForm.compressImage(paths.get(i)));
         }
         for(int i = 0; i < paths.size(); i++) {
@@ -174,8 +161,6 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            File file = new File(paths.get(i));
-//            imgFiles.add(file);
         }
         return imgFiles;
     }
@@ -188,29 +173,5 @@ public class PostMessage extends BaseActivity implements TagFlowLayout.OnTagClic
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    // 事故标签事件的监听函数
-    @Override
-    public boolean onTagClick(View view, int position, FlowLayout parent) {
-        return false;
-    }
-
-    @Override
-    public void onSelected(Set<Integer> selectPosSet) {
-        String tags = "";
-        Object[] id = selectPosSet.toArray();
-        if(id.length > 0){
-            tags = mNames[Integer.valueOf(id[0].toString())];
-        }
-        for (int i = 1; i < id.length; i++) {
-            tags += "/" + mNames[Integer.valueOf(id[i].toString())];
-        }
-//        Integer[] id = (Integer[])selectPosSet.toArray();
-//        for (Integer anId : id) {
-//            tags += mNames[anId] + "/";
-//        }
-        accidentTags = tags;
-        Log.d("accTag", "choose:" + selectPosSet.toString());
     }
 }

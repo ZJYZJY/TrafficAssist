@@ -38,6 +38,23 @@
     <string name="now_user_register">注册中…</string>
     <string name="title_activity_settings">设置</string>
 
+
+    <string name="tag_car_type">车辆型号</string>
+    <string name="tag_car_type1">危险品车</string>
+    <string name="tag_car_type2">中大型车</string>
+    <string name="tag_car_type3">小型车</string>
+
+    <string name="tag_people_effect">人员伤亡</string>
+    <string name="tag_people_effect1">人员受伤</string>
+    <string name="tag_people_effect2">人员死亡</string>
+    <string name="tag_people_effect3">较多人员伤亡</string>
+
+    <string name="tag_car_crash">车辆损坏</string>
+    <string name="tag_car_crash1">轻微碰擦</string>
+    <string name="tag_car_crash2">较少车辆损坏</string>
+    <string name="tag_car_crash3">连环碰撞</string>
+
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->

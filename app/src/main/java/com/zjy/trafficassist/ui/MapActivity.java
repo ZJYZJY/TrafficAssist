@@ -2,6 +2,7 @@ package com.zjy.trafficassist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -46,25 +47,27 @@ import com.amap.api.services.nearby.NearbySearch;
 import com.amap.api.services.nearby.NearbySearch.NearbyQuery;
 import com.amap.api.services.nearby.NearbySearchFunctionType;
 import com.amap.api.services.nearby.NearbySearchResult;
-import com.zjy.trafficassist.App;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.WebService;
 import com.zjy.trafficassist.model.User;
+import com.zjy.trafficassist.utils.AutoLogin;
+import com.zjy.trafficassist.utils.ConnectIMServer;
+import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.SensorEventHelper;
+import com.zjy.trafficassist.utils.UserLoginTask;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.rong.imkit.RongIM;
-import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 
-import static com.zjy.trafficassist.UserStatus.Login_status;
-import static com.zjy.trafficassist.UserStatus.editor;
+import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
+import static com.zjy.trafficassist.UserStatus.EDITOR;
 import static com.zjy.trafficassist.UserStatus.first_show;
-import static com.zjy.trafficassist.UserStatus.sp;
-import static com.zjy.trafficassist.UserStatus.user;
+import static com.zjy.trafficassist.UserStatus.SP;
+import static com.zjy.trafficassist.UserStatus.USER;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -98,8 +101,6 @@ public class MapActivity extends AppCompatActivity
     private boolean mFirstFix = false;
     private Map<String, Boolean> supportConversation = new HashMap<>();
 
-    private UserLoginTask mAuthTask;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,9 +128,7 @@ public class MapActivity extends AppCompatActivity
         NearbySearch PoliceNearbySearch = NearbySearch.getInstance(getApplicationContext());
         //设置附近监听
         PoliceNearbySearch.addNearbyListener(this);
-//        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
 
-        connectIMServer("bDIjjHtLja1iRktPqjHfwdMnhDhvzg9jRuzXf1Haw/6PfyKlZHV1m/1pMTwBCa0sZanUGmejRpJ73wRgY7uc/Q==");
         // 设置支持聊天信息的类型
         supportConversation.put(Conversation.ConversationType.PRIVATE.getName(), false);
 
@@ -140,47 +139,6 @@ public class MapActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-
-        sp = this.getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        // 自动登录
-        if(sp.getString("USER_NAME", null) != null
-                && sp.getString("PASSWORD", null) != null){
-            user.setUsername(sp.getString("USER_NAME", ""));
-            user.setPassword(sp.getString("PASSWORD", ""));
-            Log.e("sp_userinfo", "sp" + user.getUsername() + user.getPassword());
-
-            mAuthTask = new UserLoginTask();
-            mAuthTask.execute();
-        }
-        // 保存用户名和密码
-        if(UserStatus.user != null){
-            editor = sp.edit();
-            editor.putString("USER_NAME", user.getUsername());
-            editor.putString("PASSWORD", user.getPassword());
-            editor.commit();
-        }
-
-//        new AsyncTask<Void, Void, Boolean>(){
-//
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                String result;
-//                result = WebService.Login(user.getUsername(), user.getPassword());
-//                return Boolean.parseBoolean(result);
-//            }
-//            @Override
-//
-//            protected void onPostExecute(final Boolean success) {
-//
-//                if (success) {
-//                    Login_status = true;
-//                } else {
-//                    Login_status = false;
-//                    Toast.makeText(MapActivity.this, "账户信息有误，请重新登录", Toast.LENGTH_SHORT).show();
-//                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
-//                }
-//            }
-//        };
     }
 
     /**
@@ -194,6 +152,8 @@ public class MapActivity extends AppCompatActivity
         }
         mSensorHelper = new SensorEventHelper(this);
         mSensorHelper.registerSensorListener();
+        // 自动登录
+        AutoLogin.getInstance().login(this);
     }
 
     /**
@@ -231,7 +191,6 @@ public class MapActivity extends AppCompatActivity
             mlocationClient.startLocation();
         }
     }
-
 
     @Override
     public void deactivate() {
@@ -278,8 +237,8 @@ public class MapActivity extends AppCompatActivity
                 location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
                 //搜索附近的交警信息
                 NearbySearchCondition();
-                if(UserStatus.user != null) {
-                    UserStatus.user.setLocation(location);
+                if(UserStatus.USER != null) {
+                    UserStatus.USER.setLocation(location);
                 }
                 if (!mFirstFix) {
                     mFirstFix = true;
@@ -296,7 +255,7 @@ public class MapActivity extends AppCompatActivity
                 //mlocationClient.stopLocation(); //停止定位
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
-                Log.e("AmapErr", errText);
+                LogUtil.e("AmapErr", errText);
                 Toast.makeText(getApplicationContext(), errText, Toast.LENGTH_LONG).show();
             }
         }
@@ -361,7 +320,7 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //侧边导航栏按键监听事件
         int id = item.getItemId();
-        if(Login_status) {
+        if(LOGIN_STATUS) {
             if (id == R.id.user_info) {
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
             } else if (id == R.id.alarm_history) {
@@ -378,7 +337,7 @@ public class MapActivity extends AppCompatActivity
         } else if (id == R.id.nav_chat) {
             RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
         } else if(id == R.id.nav_about){
-
+            UserStatus.ClearUserLoginStatus(this);
 //            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
 //                    + "条数据", Toast.LENGTH_SHORT).show();
         }
@@ -391,7 +350,7 @@ public class MapActivity extends AppCompatActivity
         //主界面按钮监听事件
         switch (v.getId()) {
             case R.id.fab_post:
-                if(Login_status)
+                if(LOGIN_STATUS)
                     startActivity(new Intent(MapActivity.this, PostMessage.class));
                 else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
@@ -428,13 +387,11 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-//        if (Login_status && first_show) {
-//            Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-//            display_user_name.setText(user.getUsername());
-//            first_show = false;
-//        }
-        logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
-        unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
+        if(USER != null){
+            display_user_name.setText(USER.getUsername());
+        }
+        logined.setVisibility(LOGIN_STATUS ? View.VISIBLE : View.GONE);
+        unlogin.setVisibility(LOGIN_STATUS ? View.GONE : View.VISIBLE);
         if (mSensorHelper == null) {
             mSensorHelper = new SensorEventHelper(this);
         }
@@ -489,13 +446,13 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onNearbyInfoSearched(NearbySearchResult nearbySearchResult, int i) {
-    //搜索周边附近用户回调处理
+        //搜索周边附近用户回调处理
         if(i == 1000){
             if (nearbySearchResult != null
                     && nearbySearchResult.getNearbyInfoList() != null
                     && nearbySearchResult.getNearbyInfoList().size() > 0) {
                 NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
-                Log.e("NearbySearchResult",
+                LogUtil.e("NearbySearchResult",
                         "周边搜索结果为size " + nearbySearchResult.getNearbyInfoList().size() +
                                 " first："+ nearbyInfo.getUserID() + "  " +
                                 nearbyInfo.getDistance()+ "  " +
@@ -503,7 +460,7 @@ public class MapActivity extends AppCompatActivity
                                 nearbyInfo.getTimeStamp() + "  " +
                                 nearbyInfo.getPoint().toString());
             } else {
-                Log.e("NearbySearchResult", "周边搜索结果为空");
+                LogUtil.e("NearbySearchResult", "周边搜索结果为空");
             }
         }
         else{
@@ -514,89 +471,5 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onNearbyInfoUploaded(int i) {
 
-    }
-
-    public void connectIMServer(String token) {
-
-        if (getApplicationInfo().packageName.equals(App.getCurProcessName(getApplicationContext()))) {
-
-            RongIM.connect(token, new RongIMClient.ConnectCallback() {
-
-                /**
-                 * Token 错误。可以从下面两点检查 1.  Token 是否过期，如果过期您需要向 App Server 重新请求一个新的 Token
-                 *                  2.  token 对应的 appKey 和工程里设置的 appKey 是否一致
-                 */
-                @Override
-                public void onTokenIncorrect() {
-                    Log.d("LoginActivity", "--onTokenIncorrect--");
-                }
-
-                /**
-                 * 连接融云成功
-                 * @param userid 当前 token 对应的用户 id
-                 */
-                @Override
-                public void onSuccess(String userid) {
-                    Log.d("LoginActivity", "--onSuccess--" + userid);
-                    Toast.makeText(MapActivity.this, userid + " 登陆成功", Toast.LENGTH_SHORT).show();
-                }
-
-                /**
-                 * 连接融云失败
-                 * @param errorCode 错误码，可到官网 查看错误码对应的注释
-                 */
-                @Override
-                public void onError(RongIMClient.ErrorCode errorCode) {
-                    Log.d("LoginActivity", "--onError--" + errorCode);
-                }
-            });
-        }
-    }
-
-    /**
-     * 后台线程进行登陆操作
-     * @ReturnCode String "true" or "false"
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private String ReturnCode;
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-            ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
-            System.out.println(ReturnCode);
-            return Boolean.parseBoolean(ReturnCode);
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-
-            if (success) {
-                Login_status = true;
-                if (first_show) {
-                    Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-                    display_user_name.setText(user.getUsername());
-                    first_show = false;
-                }
-                logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
-                unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
-            } else {
-                Toast.makeText(MapActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-        }
     }
 }

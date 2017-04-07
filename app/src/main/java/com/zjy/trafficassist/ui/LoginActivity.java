@@ -1,67 +1,36 @@
 package com.zjy.trafficassist.ui;
 
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.model.User;
-import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.Manifest.permission.READ_CONTACTS;
+import com.zjy.trafficassist.utils.LoginCheck;
+import com.zjy.trafficassist.utils.UserLoginTask;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends BaseActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends BaseActivity {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask;
     private User user;
     private DatabaseManager DBManager;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
+    private EditText mUsernameView;
     private ProgressDialog mPDialog;
     private EditText mPasswordView;
     private TextView mSignup;
@@ -73,15 +42,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
-        populateAutoComplete();
 
+        mUsernameView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         mSignup = (TextView) findViewById(R.id.user_sign_up);
-        TextPaint tp0 = mSignup.getPaint();
-        tp0.setFakeBoldText(true);
         mSignup.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,15 +56,6 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         });
 
         mForgetpassword = (TextView) findViewById(R.id.forget_password);
-        TextPaint tp1 = mForgetpassword.getPaint();
-        tp1.setFakeBoldText(true);
-//        mForgetpassword.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(LoginActivity.this, "数据库有" + DBManager.getUserCount()
-//                        + "条数据", Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
         mUserSignInButton = (Button) findViewById(R.id.user_sign_in);
         mUserSignInButton.setOnClickListener(new OnClickListener() {
@@ -108,59 +64,8 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 attemptLogin();
             }
         });
-
-        DBManager = new DatabaseManager(this);
     }
 
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mUsernameView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }
-
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
         if (mAuthTask != null) {
             return;
@@ -178,7 +83,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
+        // Check for a valid password, if the USER entered one.
         if (!TextUtils.isEmpty(user.getPassword()) && !isPasswordValid(user.getPassword())) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
@@ -202,15 +107,16 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the USER login attempt.
             mPDialog = new ProgressDialog(LoginActivity.this);
             mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mPDialog.setMessage(getResources().getString(R.string.now_user_login));
             mPDialog.setCancelable(false);
             mPDialog.show();
-            mAuthTask = new UserLoginTask();
-            mAuthTask.execute();
-//            mPDialog.dismiss();
+//            mAuthTask = new UserLoginTask(this, user, mPDialog);
+//            mAuthTask.execute();
+            LoginCheck loginCheck = new LoginCheck(this, user, mPDialog);
+            loginCheck.login();
         }
     }
 
@@ -220,107 +126,6 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
 
     private boolean isPasswordValid(String password) {
         return password.length() > 6;
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mUsernameView.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
-    /**
-     * 后台线程进行登陆操作
-     * @ReturnCode String "true" or "false"
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private String ReturnCode;
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-            ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
-//            System.out.println(ReturnCode);
-            return Boolean.parseBoolean(ReturnCode);
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            mPDialog.dismiss();
-
-            if (success) {
-                UserStatus.Login_status = true;
-                UserStatus.user = user;
-                finish();
-                startActivity(new Intent(LoginActivity.this, MapActivity.class));
-            } else {
-                Toast.makeText(LoginActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            mPDialog.dismiss();
-        }
     }
 
     @Override
