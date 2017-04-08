@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
 import com.zjy.trafficassist.model.AlarmHistory;
 
 import org.json.JSONArray;
@@ -17,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created 2016/5/5.
@@ -65,6 +65,10 @@ public class TransForm {
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
         return fileType + dateFormat.format(date);
+    }
+
+    public static String uuid(){
+        return UUID.randomUUID().toString();
     }
 
     /**

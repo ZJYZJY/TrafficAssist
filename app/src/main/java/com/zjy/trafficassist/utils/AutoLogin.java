@@ -35,8 +35,6 @@ public class AutoLogin {
             User user = new User(username, password);
             LogUtil.i("SP  " + user.getUsername() + "  " + user.getPassword());
 
-//            UserLoginTask mAuthTask = new UserLoginTask(context, user);
-//            mAuthTask.execute();
             LoginCheck loginCheck = new LoginCheck(context, user);
             loginCheck.login();
         }

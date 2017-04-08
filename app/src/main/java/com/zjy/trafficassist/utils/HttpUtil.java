@@ -122,7 +122,7 @@ public class HttpUtil {
          * @param user 用户对象
          */
         @POST(APIPath.SIGN_UP)
-        Call<ResponseBody> signup(@Body User user);
+        Call<ResponseBody> signUp(@Body User user);
 
         /**
          * 获取登录IM服务器所用的token
@@ -144,16 +144,13 @@ public class HttpUtil {
         @Multipart
         @POST(APIPath.UPLOAD_HISTORY)
         Call<ResponseBody> uploadHistory(@Part List<MultipartBody.Part> parts);
-
-        @POST(APIPath.UPLOAD_HISTORY)
-        Call<ResponseBody> uploadHistory(@PartMap Map<String, RequestBody> photos, @PartMap Map<String, String> historyInfo);
     }
 
     private class APIPath{
         
         private static final String LOGIN = "trafficassist/user/login.php";
 
-        private static final String SIGN_UP = "trafficassist/user/signup.php";
+        private static final String SIGN_UP = "trafficassist/user/signUp.php";
 
         private static final String GET_TOKEN = "trafficassist/IMServerApi/getToken.php";
 

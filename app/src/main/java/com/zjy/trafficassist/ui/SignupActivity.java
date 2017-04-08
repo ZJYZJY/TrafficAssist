@@ -3,7 +3,6 @@ package com.zjy.trafficassist.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,11 +14,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.BaseActivity;
-import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
 import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
 
@@ -106,7 +103,7 @@ public class SignupActivity extends BaseActivity {
             mPDialog.setMessage(getResources().getString(R.string.now_user_register));
             mPDialog.setCancelable(true);
             mPDialog.show();
-            HttpUtil.create().signup(user).enqueue(new Callback<ResponseBody>() {
+            HttpUtil.create().signUp(user).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     mPDialog.dismiss();

@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 
 import android.os.Bundle;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,18 +13,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.zjy.trafficassist.BaseActivity;
-import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.LoginCheck;
-import com.zjy.trafficassist.utils.UserLoginTask;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends BaseActivity {
 
-    private UserLoginTask mAuthTask;
     private User user;
 //    private DatabaseManager DBManager;
 
@@ -67,9 +63,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mUsernameView.setError(null);
@@ -113,8 +106,7 @@ public class LoginActivity extends BaseActivity {
             mPDialog.setMessage(getResources().getString(R.string.now_user_login));
             mPDialog.setCancelable(false);
             mPDialog.show();
-//            mAuthTask = new UserLoginTask(this, user, mPDialog);
-//            mAuthTask.execute();
+
             LoginCheck loginCheck = new LoginCheck(this, user, mPDialog);
             loginCheck.login();
         }
