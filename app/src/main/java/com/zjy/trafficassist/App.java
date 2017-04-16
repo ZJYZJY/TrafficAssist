@@ -18,6 +18,7 @@ import io.rong.imlib.RongIMClient;
 
 public class App extends Application {
 
+    //shp
     @Override
     public void onCreate() {
         super.onCreate();
