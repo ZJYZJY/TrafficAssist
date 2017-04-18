@@ -11,6 +11,7 @@
     <string name="title_activity_login">登录/注册</string>
     <string name="label_login">登录</string>
     <string name="label_register">注册</string>
+    <string name="label_edit_detail">注册</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">用户名</string>
@@ -36,7 +37,6 @@
     <string name="now_upload_history">正在上传中…</string>
     <string name="now_user_login">正在登录…</string>
     <string name="now_user_register">注册中…</string>
-    <string name="title_activity_settings">设置</string>
 
 
     <string name="tag_car_type">车辆型号</string>
@@ -126,4 +126,5 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_settings">设置</string>
 </resources>

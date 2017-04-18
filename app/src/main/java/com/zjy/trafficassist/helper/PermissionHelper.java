@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import com.zjy.trafficassist.utils.LogUtil;
+
 /**
  * com.zjy.trafficassist.helper
  * Created by 73958 on 2017/4/6.
@@ -18,7 +20,8 @@ import android.widget.Toast;
 public abstract class PermissionHelper {
 
     public static final int REQUEST_LOCATION = 0;
-//    public static final int REQUEST_STORAGE = 1;
+
+    public static final int REQUEST_READ_STORAGE = 1;
 
     public static void requestPermission(Context context, final Activity activity, final int requestCode) {
         if (ContextCompat.checkSelfPermission(context, getPermissionString(requestCode))
@@ -38,15 +41,15 @@ public abstract class PermissionHelper {
                         })
                         .setNegativeButton("取消", null)
                         .show();
-                Toast.makeText(context, "rationally", Toast.LENGTH_SHORT).show();
+                LogUtil.d("rationally");
             } else {
                 ActivityCompat.requestPermissions(activity,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         PermissionHelper.REQUEST_LOCATION);
-                Toast.makeText(context, "directly", Toast.LENGTH_SHORT).show();
+                LogUtil.d("directly");
             }
         } else {
-            Toast.makeText(context, "granted", Toast.LENGTH_SHORT).show();
+            LogUtil.d("granted");
         }
     }
 
@@ -56,9 +59,9 @@ public abstract class PermissionHelper {
             case REQUEST_LOCATION:
                 permission = Manifest.permission.ACCESS_FINE_LOCATION;
                 break;
-//            case REQUEST_STORAGE:
-//                permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-//                break;
+            case REQUEST_READ_STORAGE:
+                permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+                break;
         }
         return permission;
     }

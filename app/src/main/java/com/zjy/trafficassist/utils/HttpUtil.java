@@ -43,7 +43,7 @@ public class HttpUtil {
 
     public static final int FAIL = 400;
 
-    public static final int EMPTY = 20;
+    public static final int EMPTY = 201;
 
     private static Retrofit instance;
 
@@ -132,7 +132,7 @@ public class HttpUtil {
         Call<ResponseBody> getToken(@QueryMap Map<String, String> user);
 
         /**
-         * 历史记录接口
+         * 获取历史记录接口
          */
         @GET(APIPath.DOWNLOAD_HISTORY)
         Call<ResponseBody> history(@Query("username") String username);
@@ -150,7 +150,7 @@ public class HttpUtil {
         
         private static final String LOGIN = "trafficassist/user/login.php";
 
-        private static final String SIGN_UP = "trafficassist/user/signUp.php";
+        private static final String SIGN_UP = "trafficassist/user/signup.php";
 
         private static final String GET_TOKEN = "trafficassist/IMServerApi/getToken.php";
 

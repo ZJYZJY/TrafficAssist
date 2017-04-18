@@ -2,9 +2,11 @@ package com.zjy.trafficassist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -46,7 +48,9 @@ import com.amap.api.services.nearby.NearbySearchFunctionType;
 import com.amap.api.services.nearby.NearbySearchResult;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.helper.PermissionHelper;
 import com.zjy.trafficassist.utils.AutoLogin;
+import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
 import com.zjy.trafficassist.utils.SensorEventHelper;
 
@@ -58,6 +62,7 @@ import io.rong.imlib.model.Conversation;
 
 import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
 import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_READ_STORAGE;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -315,21 +320,22 @@ public class MapActivity extends AppCompatActivity
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
             } else if (id == R.id.alarm_history) {
                 startActivity(new Intent(MapActivity.this, AlarmHistory.class));
-            } else if (id == R.id.nav_refer) {
-
+            } else if (id == R.id.nav_service) {
+                startActivity(new Intent(MapActivity.this, NearbyService.class));
             }
         }else {
             Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MapActivity.this, LoginActivity.class));
         }
         if (id == R.id.nav_setting) {
-
+            startActivity(new Intent(MapActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_chat) {
             RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
         } else if(id == R.id.nav_about){
-            UserStatus.ClearUserLoginStatus(this);
 //            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
 //                    + "条数据", Toast.LENGTH_SHORT).show();
+        } else if(id == R.id.nav_exit){
+            UserStatus.ClearUserLoginStatus(this);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -340,9 +346,16 @@ public class MapActivity extends AppCompatActivity
         //主界面按钮监听事件
         switch (v.getId()) {
             case R.id.fab_post:
-                if(LOGIN_STATUS)
+                if(LOGIN_STATUS){
+                    PermissionHelper.requestPermission(getApplicationContext(), MapActivity.this, REQUEST_READ_STORAGE);
+                    if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                            PermissionHelper.getPermissionString(REQUEST_READ_STORAGE))
+                            != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, "请允许读取手机内存权限", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     startActivity(new Intent(MapActivity.this, PostMessage.class));
-                else{
+                } else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MapActivity.this, LoginActivity.class));
                 }

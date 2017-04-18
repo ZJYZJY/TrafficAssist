@@ -32,7 +32,7 @@
             android:layout_height="30dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="@drawable/nav_head_btn"
+            android:background="@drawable/transparent_btn"
             android:text="@string/title_activity_login"
             android:textSize="15sp" />
     </LinearLayout>

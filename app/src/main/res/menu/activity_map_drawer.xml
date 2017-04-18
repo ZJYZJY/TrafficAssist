@@ -11,8 +11,8 @@
             android:title="报警记录" />
         <!--android:icon="@drawable/ic_menu_gallery"-->
         <item
-            android:id="@+id/nav_refer"
-            android:title="违章查询" />
+            android:id="@+id/nav_service"
+            android:title="周边服务" />
         <!--android:icon="@drawable/ic_menu_slideshow"-->
         <!--<item-->
         <!--android:id="@+id/nav_manage"-->
@@ -30,6 +30,9 @@
             android:id="@+id/nav_about"
             android:title="关于" />
         <!--android:icon="@drawable/ic_menu_send"-->
+        <item
+            android:id="@+id/nav_exit"
+            android:title="退出登录" />
     </group>
 
 
