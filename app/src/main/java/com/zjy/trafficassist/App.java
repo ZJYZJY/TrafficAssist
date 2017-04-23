@@ -3,6 +3,7 @@ package com.zjy.trafficassist;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,6 +25,15 @@ public class App extends Application {
         if (getApplicationInfo().packageName.equals(getCurProcessName(getApplicationContext()))){
             RongIM.init(this);
         }
+        // 每隔20s上传用户信息
+//        final Handler handler = new Handler();
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                handler.postDelayed(this, 20000);
+//            }
+//        };
     }
 
     public static String getCurProcessName(Context context) {

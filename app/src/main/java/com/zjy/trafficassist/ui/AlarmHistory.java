@@ -114,8 +114,8 @@ public class AlarmHistory extends BaseActivity implements RecyclerItemClickListe
     }
 
     @Override
-    public void onItemClick(View view, int postion) {
-        Toast.makeText(this, "点击了 " + postion, Toast.LENGTH_SHORT).show();
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "点击了 " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -4,36 +4,30 @@
     <group android:checkableBehavior="none">
         <item
             android:id="@+id/user_info"
+            android:icon="@drawable/ic_nav_user"
             android:title="车主信息" />
-        <!--android:icon="@drawable/ic_menu_camera"-->
         <item
             android:id="@+id/alarm_history"
+            android:icon="@drawable/ic_nav_record"
             android:title="报警记录" />
-        <!--android:icon="@drawable/ic_menu_gallery"-->
         <item
             android:id="@+id/nav_service"
+            android:icon="@drawable/ic_nav_nearby"
             android:title="周边服务" />
-        <!--android:icon="@drawable/ic_menu_slideshow"-->
-        <!--<item-->
-        <!--android:id="@+id/nav_manage"-->
-        <!--android:title="Tools" />-->
-        <!--android:icon="@drawable/ic_menu_manage"-->
         <item
             android:id="@+id/nav_chat"
+            android:icon="@drawable/ic_nav_chat"
             android:title="会话" />
         <item
             android:id="@+id/nav_setting"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_nav_setting"
             android:title="设置" />
-        <!--android:icon="@drawable/ic_menu_share"-->
         <item
             android:id="@+id/nav_about"
+            android:icon="@drawable/ic_nav_about"
             android:title="关于" />
-        <!--android:icon="@drawable/ic_menu_send"-->
         <item
             android:id="@+id/nav_exit"
             android:title="退出登录" />
     </group>
-
-
 </menu>

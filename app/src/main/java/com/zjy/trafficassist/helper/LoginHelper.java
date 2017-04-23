@@ -1,9 +1,12 @@
-package com.zjy.trafficassist.utils;
+package com.zjy.trafficassist.helper;
 
 import android.content.Context;
 
 import com.zjy.trafficassist.UserStatus;
+import com.zjy.trafficassist.listener.LoginStatusChangedListener;
 import com.zjy.trafficassist.model.User;
+import com.zjy.trafficassist.utils.LogUtil;
+import com.zjy.trafficassist.utils.LoginCheck;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.zjy.trafficassist.UserStatus.EDITOR;
@@ -14,18 +17,18 @@ import static com.zjy.trafficassist.UserStatus.SP;
  * Created by 73958 on 2017/3/22.
  */
 
-public class AutoLogin {
+public class LoginHelper {
 
-    private static AutoLogin instance;
+    private static LoginHelper instance;
 
-    public static AutoLogin getInstance(){
+    public static LoginHelper getInstance(){
         if(instance == null){
-            return new AutoLogin();
+            return new LoginHelper();
         }
         return instance;
     }
 
-    public void login(Context context){
+    public void login(Context context, LoginStatusChangedListener listener){
         SP = context.getSharedPreferences("USER_INFO", MODE_PRIVATE);
         // 自动登录
         if(SP.getString("USER_NAME", null) != null
@@ -35,9 +38,15 @@ public class AutoLogin {
             User user = new User(username, password);
             LogUtil.i("SP  " + user.getUsername() + "  " + user.getPassword());
 
-            LoginCheck loginCheck = new LoginCheck(context, user);
+            LoginCheck loginCheck = new LoginCheck(context, listener, user);
             loginCheck.login();
         }
+    }
+
+    public void logout(Context context, LoginStatusChangedListener listener){
+        LoginCheck loginCheck = new LoginCheck(context, listener);
+        loginCheck.setOnLoginStatusChanged(listener);
+        loginCheck.logout();
     }
 
     public void saveUserInfo(Context context){

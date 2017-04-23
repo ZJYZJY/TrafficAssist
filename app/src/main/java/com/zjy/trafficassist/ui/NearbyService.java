@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.zjy.trafficassist.DiscoverFragment;
+import com.zjy.trafficassist.fragment.DiscoverFragment;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.adapter.ViewPagerAdapter;
 

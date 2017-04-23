@@ -111,10 +111,11 @@ public class SignupActivity extends BaseActivity {
                         String res = response.body().string();
                         if(HttpUtil.stateCode(res) == SUCCESS){
                             Toast.makeText(SignupActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
-                            UserStatus.LOGIN_STATUS = true;
-                            UserStatus.USER = user;
+                            Intent intent = new Intent();
+                            intent.putExtra("username", new_username.getText().toString());
+                            intent.putExtra("password", new_passname.getText().toString());
+                            setResult(0, intent);
                             finish();
-                            startActivity(new Intent(SignupActivity.this, MapActivity.class));
                         }else{
                             Toast.makeText(SignupActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
                         }

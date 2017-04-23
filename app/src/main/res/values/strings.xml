@@ -9,9 +9,11 @@
     <string name="gravity_right">right</string>
 
     <string name="title_activity_login">登录/注册</string>
+
     <string name="label_login">登录</string>
     <string name="label_register">注册</string>
-    <string name="label_edit_detail">注册</string>
+    <string name="label_edit_detail">报警信息</string>
+    <string name="label_edit_user_info">编辑个人信息</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">用户名</string>
@@ -54,6 +56,11 @@
     <string name="tag_car_crash2">较少车辆损坏</string>
     <string name="tag_car_crash3">连环碰撞</string>
 
+    <!--编辑用户信息-->
+    <string name="pref_edit_user_real_name">车主姓名</string>
+    <string name="pref_edit_user_phone_number">手机号</string>
+    <string name="pref_edit_user_driver_number">驾驶证号</string>
+    <string name="pref_edit_user_car_number">车牌号码</string>
 
     <!-- Strings related to Settings -->
 

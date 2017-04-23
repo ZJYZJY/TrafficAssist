@@ -49,9 +49,10 @@ import com.amap.api.services.nearby.NearbySearchResult;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.helper.PermissionHelper;
-import com.zjy.trafficassist.utils.AutoLogin;
-import com.zjy.trafficassist.utils.HttpUtil;
+import com.zjy.trafficassist.listener.LoginStatusChangedListener;
+import com.zjy.trafficassist.helper.LoginHelper;
 import com.zjy.trafficassist.utils.LogUtil;
+import com.zjy.trafficassist.utils.LoginCheck;
 import com.zjy.trafficassist.utils.SensorEventHelper;
 
 import java.util.HashMap;
@@ -148,7 +149,16 @@ public class MapActivity extends AppCompatActivity
         mSensorHelper = new SensorEventHelper(this);
         mSensorHelper.registerSensorListener();
         // 自动登录
-        AutoLogin.getInstance().login(this);
+        LoginHelper.getInstance().login(this, new LoginStatusChangedListener() {
+            @Override
+            public void onLoginStatusChanged(boolean loginStatus) {
+                logined.setVisibility(loginStatus ? View.VISIBLE : View.GONE);
+                unlogin.setVisibility(loginStatus ? View.GONE : View.VISIBLE);
+                if(USER != null && loginStatus){
+                    display_user_name.setText(USER.getUsername());
+                }
+            }
+        });
     }
 
     /**
@@ -227,8 +237,6 @@ public class MapActivity extends AppCompatActivity
     public void onLocationChanged(AMapLocation amapLocation) {
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-                //显示系统小蓝点
-                //mListener.onLocationChanged(amapLocation);
                 location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
                 //搜索附近的交警信息
                 NearbySearchCondition();
@@ -267,7 +275,6 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.map, menu);
         return true;
     }
@@ -325,17 +332,26 @@ public class MapActivity extends AppCompatActivity
             }
         }else {
             Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(MapActivity.this, LoginActivity.class));
+            startLoginActivity();
         }
         if (id == R.id.nav_setting) {
             startActivity(new Intent(MapActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_chat) {
             RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
         } else if(id == R.id.nav_about){
-//            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
-//                    + "条数据", Toast.LENGTH_SHORT).show();
+
         } else if(id == R.id.nav_exit){
-            UserStatus.ClearUserLoginStatus(this);
+            LoginHelper.getInstance().logout(this, new LoginStatusChangedListener() {
+                @Override
+                public void onLoginStatusChanged(boolean loginStatus) {
+                    logined.setVisibility(loginStatus ? View.VISIBLE : View.GONE);
+                    unlogin.setVisibility(loginStatus ? View.GONE : View.VISIBLE);
+                    if(!loginStatus) {
+                        Toast.makeText(MapActivity.this, "注销成功", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -357,17 +373,31 @@ public class MapActivity extends AppCompatActivity
                     startActivity(new Intent(MapActivity.this, PostMessage.class));
                 } else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                    startLoginActivity();
                 }
                 break;
             case R.id.login_map_aty:
-                startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                startLoginActivity();
                 break;
             case R.id.display_user_name:
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    public void startLoginActivity(){
+        LoginActivity.setOnLoginStatusChanged(new LoginStatusChangedListener() {
+            @Override
+            public void onLoginStatusChanged(boolean loginStatus) {
+                logined.setVisibility(loginStatus ? View.VISIBLE : View.GONE);
+                unlogin.setVisibility(loginStatus ? View.GONE : View.VISIBLE);
+                if(USER != null && loginStatus){
+                    display_user_name.setText(USER.getUsername());
+                }
+            }
+        });
+        startActivity(new Intent(MapActivity.this, LoginActivity.class));
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -390,11 +420,6 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        if(USER != null){
-            display_user_name.setText(USER.getUsername());
-        }
-        logined.setVisibility(LOGIN_STATUS ? View.VISIBLE : View.GONE);
-        unlogin.setVisibility(LOGIN_STATUS ? View.GONE : View.VISIBLE);
         if (mSensorHelper == null) {
             mSensorHelper = new SensorEventHelper(this);
         }
@@ -455,7 +480,7 @@ public class MapActivity extends AppCompatActivity
                     && nearbySearchResult.getNearbyInfoList() != null
                     && nearbySearchResult.getNearbyInfoList().size() > 0) {
                 NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
-                LogUtil.e("NearbySearchResult",
+                LogUtil.d("NearbySearchResult",
                         "周边搜索结果为size " + nearbySearchResult.getNearbyInfoList().size() +
                                 " first："+ nearbyInfo.getUserID() + "  " +
                                 nearbyInfo.getDistance()+ "  " +
@@ -463,7 +488,7 @@ public class MapActivity extends AppCompatActivity
                                 nearbyInfo.getTimeStamp() + "  " +
                                 nearbyInfo.getPoint().toString());
             } else {
-                LogUtil.e("NearbySearchResult", "周边搜索结果为空");
+                LogUtil.d("NearbySearchResult", "周边搜索结果为空");
             }
         }
         else{

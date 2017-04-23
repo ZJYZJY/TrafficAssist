@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.listener.LoginStatusChangedListener;
 import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.LoginCheck;
 
@@ -33,6 +34,8 @@ public class LoginActivity extends BaseActivity {
     private TextView mForgetpassword;
     private Button mUserSignInButton;
 
+    private static LoginStatusChangedListener loginStatusChangedListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +49,7 @@ public class LoginActivity extends BaseActivity {
         mSignup.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
-                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+                startActivityForResult(new Intent(LoginActivity.this, SignupActivity.class), 0);
             }
         });
 
@@ -108,8 +110,26 @@ public class LoginActivity extends BaseActivity {
             mPDialog.show();
 
             LoginCheck loginCheck = new LoginCheck(this, user, mPDialog);
+            loginCheck.setOnLoginStatusChanged(loginStatusChangedListener);
             loginCheck.login();
         }
+    }
+
+    public static void setOnLoginStatusChanged(LoginStatusChangedListener listener) {
+        loginStatusChangedListener = listener;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 0) {
+            if (requestCode == 0) {
+                if (data != null) {
+                    mUsernameView.setText(data.getStringExtra("username"));
+                    mPasswordView.setText(data.getStringExtra("password"));
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private boolean isEmailValid(String username) {
