@@ -144,6 +144,13 @@ public class HttpUtil {
         @Multipart
         @POST(APIPath.UPLOAD_HISTORY)
         Call<ResponseBody> uploadHistory(@Part List<MultipartBody.Part> parts);
+
+        /**
+         * 用户信息修改接口
+         * @param userInfo 需要修改的用户信息项
+         */
+        @GET(APIPath.MODIFY_USER_INFO)
+        Call<ResponseBody> modifyUserInfo(@QueryMap Map<String, String> userInfo);
     }
 
     private class APIPath{
@@ -157,5 +164,7 @@ public class HttpUtil {
         private static final String DOWNLOAD_HISTORY = "trafficassist/user/downloadHistory.php";
 
         private static final String UPLOAD_HISTORY = "trafficassist/user/uploadHistory.php";
+
+        private static final String MODIFY_USER_INFO = "";
     }
 }

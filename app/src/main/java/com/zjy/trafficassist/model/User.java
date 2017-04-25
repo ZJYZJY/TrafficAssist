@@ -1,8 +1,5 @@
 package com.zjy.trafficassist.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.amap.api.maps.model.LatLng;
 
 /**
@@ -12,11 +9,11 @@ public class User {
 
     private String username;
     private String password;
-    private String nickname;
+    private String realname;
     private LatLng location;
 
     private String driverNumber;
-    private String typeOfCar;
+    private String driverType;
     private String carNumber;
     private String sex;
 
@@ -25,7 +22,7 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.nickname = username;
+        this.realname = username;
     }
 
     public String getDriverNumber() {
@@ -36,12 +33,12 @@ public class User {
         this.driverNumber = driverNumber;
     }
 
-    public String getTypeOfCar() {
-        return typeOfCar;
+    public String getDriverType() {
+        return driverType;
     }
 
-    public void setTypeOfCar(String typeOfCar) {
-        this.typeOfCar = typeOfCar;
+    public void setDriverType(String driverType) {
+        this.driverType = driverType;
     }
 
     public String getCarNumber() {
@@ -68,8 +65,8 @@ public class User {
         return password;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getRealname() {
+        return realname;
     }
 
     public LatLng getLocation() {
@@ -84,8 +81,8 @@ public class User {
         this.password = password;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setRealname(String realname) {
+        this.realname = realname;
     }
 
     public void setLocation(LatLng location) {

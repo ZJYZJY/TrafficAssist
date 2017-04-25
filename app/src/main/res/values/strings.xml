@@ -60,6 +60,7 @@
     <string name="pref_edit_user_real_name">车主姓名</string>
     <string name="pref_edit_user_phone_number">手机号</string>
     <string name="pref_edit_user_driver_number">驾驶证号</string>
+    <string name="pref_edit_user_driver_type">准驾车型</string>
     <string name="pref_edit_user_car_number">车牌号码</string>
 
     <!-- Strings related to Settings -->

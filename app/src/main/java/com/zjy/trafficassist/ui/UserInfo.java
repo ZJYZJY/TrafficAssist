@@ -82,7 +82,7 @@ public class UserInfo extends AppCompatActivity {
         realName.setText(getPreference("user_real_name"));
         phoneNumber.setText(getPreference("user_phone_number"));
         driverNumber.setText(getPreference("user_driver_number"));
-//        driverType.setText(getPreference("user_real_name"));
+        driverType.setText(getPreference("user_driver_type"));
         carNumber.setText(getPreference("user_car_number"));
     }
 }

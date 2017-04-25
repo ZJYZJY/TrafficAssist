@@ -53,7 +53,7 @@ public class DatabaseManager {
 //        try {
 //            for(int i = 0; i < alarmHistories.size(); i++) {
 //                database.execSQL("INSERT INTO user_history VALUES(null, ?, ?, ?, null)",
-//                        new Object[]{alarmHistories.get(i).getNickname(),
+//                        new Object[]{alarmHistories.get(i).getRealname(),
 //                                alarmHistories.get(i).getaccidentTags(),
 //                                String.valueOf(alarmHistories.get(i).isSerious())});
 //            }

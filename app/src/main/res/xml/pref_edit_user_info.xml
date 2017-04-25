@@ -30,6 +30,14 @@
         <EditTextPreference
             android:capitalize="words"
             android:inputType="text"
+            android:key="user_driver_type"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:title="@string/pref_edit_user_driver_type" />
+
+        <EditTextPreference
+            android:capitalize="words"
+            android:inputType="text"
             android:key="user_car_number"
             android:maxLines="1"
             android:singleLine="true"

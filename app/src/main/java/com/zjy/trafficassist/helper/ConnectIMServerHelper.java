@@ -60,7 +60,7 @@ public class ConnectIMServerHelper {
 
                     Map<String, String> user = new HashMap<>();
                     user.put("username", USER.getUsername());
-                    user.put("tname", USER.getNickname());
+                    user.put("tname", USER.getRealname());
                     HttpUtil.create().getToken(user).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

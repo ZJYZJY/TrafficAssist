@@ -37,20 +37,20 @@ public class LogUtil {
         if (LOGE) { Log.e(TAG_FILTER + getTag(), mess); }
     }
 
-    public static void v(String tag, String mess) {
-        if (LOGV) { Log.v(TAG_FILTER + getTag() + tag, mess); }
+    public static void v(String tag, String msg) {
+        if (LOGV) { Log.v(TAG_FILTER + getTag() + tag, msg); }
     }
-    public static void d(String tag, String mess) {
-        if (LOGD) { Log.d(TAG_FILTER + getTag() + tag, mess); }
+    public static void d(String tag, String msg) {
+        if (LOGD) { Log.d(TAG_FILTER + getTag() + tag, msg); }
     }
-    public static void i(String tag, String mess) {
-        if (LOGI) { Log.i(TAG_FILTER + getTag() + tag, mess); }
+    public static void i(String tag, String msg) {
+        if (LOGI) { Log.i(TAG_FILTER + getTag() + tag, msg); }
     }
-    public static void w(String tag, String mess) {
-        if (LOGW) { Log.w(TAG_FILTER + getTag() + tag, mess); }
+    public static void w(String tag, String msg) {
+        if (LOGW) { Log.w(TAG_FILTER + getTag() + tag, msg); }
     }
-    public static void e(String tag, String mess) {
-        if (LOGE) { Log.e(TAG_FILTER + getTag() + tag, mess); }
+    public static void e(String tag, String msg) {
+        if (LOGE) { Log.e(TAG_FILTER + getTag() + tag, msg); }
     }
 
     private static String getTag() {

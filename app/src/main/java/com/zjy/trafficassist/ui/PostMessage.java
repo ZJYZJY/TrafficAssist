@@ -2,13 +2,11 @@ package com.zjy.trafficassist.ui;
 
 import android.app.ProgressDialog;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
 import android.os.Bundle;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +14,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.zjy.trafficassist.*;
 import com.zjy.trafficassist.model.AlarmHistory;
 import com.zjy.trafficassist.utils.HttpUtil;
@@ -25,28 +22,16 @@ import com.zjy.trafficassist.utils.TransForm;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import me.iwf.photopicker.widget.MultiPickResultView;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -124,7 +109,7 @@ public class PostMessage extends BaseActivity {
                     }
                     List<MultipartBody.Part> parts = HttpUtil.files2Parts("image[]", sss);
                     HttpUtil.addTextPart(parts, "accidentTags", accidentTags, parts.size());
-                    HttpUtil.addTextPart(parts, "nickname", USER.getNickname(), parts.size());
+                    HttpUtil.addTextPart(parts, "nickname", USER.getRealname(), parts.size());
                     HttpUtil.addTextPart(parts, "username", USER.getUsername(), parts.size());
                     HttpUtil.addTextPart(parts, "longitude", USER.getLocation().longitude+"", parts.size());
                     HttpUtil.addTextPart(parts, "latitude", USER.getLocation().latitude+"", parts.size());

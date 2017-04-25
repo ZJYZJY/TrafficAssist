@@ -1,7 +1,11 @@
 package com.zjy.trafficassist.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.model.AlarmHistory;
@@ -17,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+
+import static com.zjy.trafficassist.UserStatus.USER;
 
 /**
  * Created 2016/5/5.
@@ -48,14 +54,43 @@ public class TransForm {
                 }
                 alarmHistories.add(new AlarmHistory(
                         str_acctag,
-                        UserStatus.USER.getNickname(),
-                        UserStatus.USER.getUsername(),
+                        USER.getRealname(),
+                        USER.getUsername(),
                         picUrl));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return alarmHistories;
+    }
+
+    public static void syncUserInfo(String res, Context context){
+        if (res != null){
+            try {
+                JSONObject json = new JSONObject(res);
+                JSONObject info = json.getJSONObject("info");
+                String real_name = info.getString("realname");
+                String sex = info.getString("sex");
+                String telephone = info.getString("telephone");
+                String driver_licence_number = info.getString("driver_licence_number");
+                String car_type = info.getString("car_type");
+                String car_number = info.getString("car_number");
+
+                USER.setRealname(real_name);
+                USER.setDriverNumber(driver_licence_number);
+                USER.setDriverType(car_type);
+                USER.setCarNumber(car_number);
+
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+                sp.edit().putString("user_real_name", real_name).apply();
+                sp.edit().putString("user_phone_number", USER.getUsername()).apply();
+                sp.edit().putString("user_driver_number", driver_licence_number).apply();
+                sp.edit().putString("user_driver_type", car_type).apply();
+                sp.edit().putString("user_car_number", car_number).apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

@@ -71,12 +71,14 @@ public class LoginCheck {
                         UserStatus.USER = user;
                         // 保存登录信息
                         LoginHelper.getInstance().saveUserInfo(context);
+                        // 同步用户个人信息
+                        TransForm.syncUserInfo(res, context);
 
                         // IM服务器登录
                         SharedPreferences preferences = context.getSharedPreferences("RongKitConfig", MODE_PRIVATE);
                         String token = preferences.getString("token", "");
                         ConnectIMServerHelper.getInstance().connectIMServer(context, token);
-
+                        // 设置登录状态监听
                         loginStatusChangedListener.onLoginStatusChanged(UserStatus.LOGIN_STATUS);
                         Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show();
 
