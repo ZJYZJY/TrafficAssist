@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
+import com.zjy.trafficassist.helper.PermissionHelper;
 import com.zjy.trafficassist.model.AlarmHistory;
 import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
@@ -38,6 +39,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_READ_STORAGE;
 import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
 public class PostMessage extends BaseActivity {
@@ -69,6 +71,9 @@ public class PostMessage extends BaseActivity {
         setContentView(R.layout.activity_post_message);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // 请求读取内部存储权限
+        PermissionHelper.requestPermission(getApplicationContext(), PostMessage.this, REQUEST_READ_STORAGE);
+
         container = (CoordinatorLayout) findViewById(R.id.post_container);
         btn_commit = (Button) findViewById(R.id.btn_commit);
         tag_car_type = (RadioGroup) findViewById(R.id.tag_car_type);
@@ -97,17 +102,17 @@ public class PostMessage extends BaseActivity {
 
                     imgFiles = getImageFiles(paths);
                     String NamesString = "";
-                    List<String> sss = new ArrayList<>();
+                    List<String> newPaths = new ArrayList<>();
                     if(imgFiles.size() > 0){
                         NamesString = imgFiles.get(0).getName();
                         for(int i = 1; i < imgFiles.size(); i++) {
                             NamesString += "/" + imgFiles.get(i).getName();
                         }
                         for(File imgFile : imgFiles){
-                            sss.add(imgFile.getAbsolutePath());
+                            newPaths.add(imgFile.getAbsolutePath());
                         }
                     }
-                    List<MultipartBody.Part> parts = HttpUtil.files2Parts("image[]", sss);
+                    List<MultipartBody.Part> parts = HttpUtil.files2Parts("image[]", newPaths);
                     HttpUtil.addTextPart(parts, "accidentTags", accidentTags, parts.size());
                     HttpUtil.addTextPart(parts, "nickname", USER.getRealname(), parts.size());
                     HttpUtil.addTextPart(parts, "username", USER.getUsername(), parts.size());

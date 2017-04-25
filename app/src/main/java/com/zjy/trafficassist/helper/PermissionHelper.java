@@ -23,14 +23,16 @@ public abstract class PermissionHelper {
 
     public static final int REQUEST_READ_STORAGE = 1;
 
+    private static String permissionStr = "";
+
     public static void requestPermission(Context context, final Activity activity, final int requestCode) {
         if (ContextCompat.checkSelfPermission(context, getPermissionString(requestCode))
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    getPermissionString(requestCode))) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("请求权限")
-                        .setMessage("应用需要定位权限")
+                        .setMessage("应用需要" + permissionStr + "权限")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -44,8 +46,8 @@ public abstract class PermissionHelper {
                 LogUtil.d("rationally");
             } else {
                 ActivityCompat.requestPermissions(activity,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PermissionHelper.REQUEST_LOCATION);
+                        new String[]{getPermissionString(requestCode)},
+                        requestCode);
                 LogUtil.d("directly");
             }
         } else {
@@ -58,9 +60,11 @@ public abstract class PermissionHelper {
         switch (requestCode) {
             case REQUEST_LOCATION:
                 permission = Manifest.permission.ACCESS_FINE_LOCATION;
+                permissionStr = "定位";
                 break;
             case REQUEST_READ_STORAGE:
                 permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+                permissionStr = "读取内部存储";
                 break;
         }
         return permission;

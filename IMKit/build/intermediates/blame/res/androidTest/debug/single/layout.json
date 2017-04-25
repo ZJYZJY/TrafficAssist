@@ -68,12 +68,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_item_base_conversation.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_refresh_list_view.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_refresh_list_view.xml"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_cs_single_choice_layout.xml",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_cs_single_choice_layout.xml"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_refresh_list_view.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_refresh_list_view.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_item_location_message.xml",
@@ -96,12 +96,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_ext_root_menu_item.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_item_public_service_rich_content_message.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_item_public_service_rich_content_message.xml"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_item_text_message.xml",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_item_text_message.xml"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_item_public_service_rich_content_message.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_item_public_service_rich_content_message.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_ext_input_edit_text.xml",
@@ -112,16 +112,16 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_ac_albums.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_ext_plugin_grid_view.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_ext_plugin_grid_view.xml"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_fr_dialog_alter.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_fr_dialog_alter.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_icon_rt_location_marker.xml",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_icon_rt_location_marker.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_fr_dialog_alter.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_fr_dialog_alter.xml"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_ext_plugin_grid_view.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\layout\\rc_ext_plugin_grid_view.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\rc_ext_emoji_grid_view.xml",

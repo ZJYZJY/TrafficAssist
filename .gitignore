@@ -9,3 +9,5 @@
 /captures
 app/.externalNativeBuild/
 projectFilesBackup/.idea/
+/IMLib/build
+/IMKit/build

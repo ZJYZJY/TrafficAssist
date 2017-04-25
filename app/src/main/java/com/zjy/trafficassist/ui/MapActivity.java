@@ -63,6 +63,7 @@ import io.rong.imlib.model.Conversation;
 
 import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
 import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_LOCATION;
 import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_READ_STORAGE;
 
 public class MapActivity extends AppCompatActivity
@@ -116,6 +117,8 @@ public class MapActivity extends AppCompatActivity
         fab_post.setOnClickListener(this);
         login.setOnClickListener(this);
 
+        // 请求定位权限
+        PermissionHelper.requestPermission(getApplicationContext(), MapActivity.this, REQUEST_LOCATION);
         //地图初始化
         mapView = (MapView) findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
@@ -363,13 +366,6 @@ public class MapActivity extends AppCompatActivity
         switch (v.getId()) {
             case R.id.fab_post:
                 if(LOGIN_STATUS){
-                    PermissionHelper.requestPermission(getApplicationContext(), MapActivity.this, REQUEST_READ_STORAGE);
-                    if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                            PermissionHelper.getPermissionString(REQUEST_READ_STORAGE))
-                            != PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "请允许读取手机内存权限", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
                     startActivity(new Intent(MapActivity.this, PostMessage.class));
                 } else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();

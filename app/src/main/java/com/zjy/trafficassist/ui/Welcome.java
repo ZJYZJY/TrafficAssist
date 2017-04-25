@@ -42,7 +42,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         editor = sp.edit();
         editor.putBoolean("fristload", false);
-        editor.commit();
+        editor.apply();
         switch (v.getId()){
             case R.id.wel_login:
                 startActivity(new Intent(Welcome.this, MapActivity.class));

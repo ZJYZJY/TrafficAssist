@@ -28,12 +28,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable\\rc_plugin_toggle_selector.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\rc_ext_plugin_image_selector.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable\\rc_ext_plugin_image_selector.xml"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\rc_bg_item.xml",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable\\rc_bg_item.xml"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\rc_ext_plugin_image_selector.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable\\rc_ext_plugin_image_selector.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\rc_switch_btn.xml",

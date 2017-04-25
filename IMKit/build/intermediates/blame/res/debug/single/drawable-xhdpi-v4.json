@@ -12,16 +12,16 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_real_time_location_hide.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f624.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f624.png"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_read_receipt_request.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_read_receipt_request.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f4a1.png",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f4a1.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_read_receipt_request.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_read_receipt_request.png"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f624.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f624.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_ext_voice_btn_hover.9.png",
@@ -40,16 +40,16 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_edit_text_background_hover.9.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f62d.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f62d.png"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_cs_leave_message_bg_hover.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_cs_leave_message_bg_hover.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_ic_def_rich_content.png",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_ic_def_rich_content.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_cs_leave_message_bg_hover.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_cs_leave_message_bg_hover.png"
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f62d.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f62d.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_ic_location_normal.png",
@@ -60,12 +60,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f607.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f556.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f556.png"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_keyboard.png",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_keyboard.png"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f556.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f556.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f48d.png",
