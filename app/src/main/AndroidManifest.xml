@@ -15,10 +15,6 @@
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
-    <!-- To auto-complete the email text field in the login form with the USER's emails -->
-    <!-- <uses-permission android:name="android.permission.GET_ACCOUNTS" /> -->
-    <!-- <uses-permission android:name="android.permission.READ_PROFILE" /> -->
-    <!-- <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -44,21 +40,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.PostMessage"
-            android:label="@string/label_edit_detail"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+            android:name=".ui.PostAccident"
+            android:label="@string/label_edit_detail" />
         <activity
             android:name=".ui.LoginActivity"
-            android:label="@string/label_login"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+            android:label="@string/label_login" />
         <activity
             android:name=".ui.SignupActivity"
-            android:label="@string/label_register"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+            android:label="@string/label_register" />
         <activity
             android:name=".ui.AlarmHistory"
-            android:label="@string/label_alarm_history"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+            android:label="@string/label_alarm_history" />
         <activity
             android:name=".ui.DetailedInfo"
             android:label="@string/label_detailed_info" />
@@ -71,11 +63,11 @@
         <activity
             android:name=".ui.Welcome"
             android:theme="@style/AppTheme_NoTopBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <!-- 会话列表 -->
         <activity
@@ -114,14 +106,25 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".ui.NearbyService"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.UserInfo"
             android:label="@string/label_user_info"
             android:theme="@style/AppTheme_NoTopBar" />
         <activity
             android:name=".ui.EditUserInfo"
-            android:label="@string/label_edit_user_info"/>
+            android:label="@string/label_edit_user_info" />
+        <activity
+            android:name=".ui.PostIssue"
+            android:label="@string/label_edit_issue" />
+        <activity android:name=".ui.issue.PostRoadJam"
+            android:label="@string/label_post_road_jam" />
+        <activity android:name=".ui.issue.PostRoadConstruction"
+            android:label="@string/label_post_road_construction" />
+        <activity android:name=".ui.issue.PostRoadClose"
+            android:label="@string/label_post_road_close" />
+        <activity android:name=".ui.issue.PostRoadWater"
+            android:label="@string/label_post_road_water"/>
     </application>
 
 </manifest>

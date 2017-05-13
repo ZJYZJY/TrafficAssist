@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,8 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.listener.LoginStatusChangedListener;
 import com.zjy.trafficassist.model.User;
 import com.zjy.trafficassist.utils.LoginCheck;
@@ -21,7 +22,7 @@ import com.zjy.trafficassist.utils.LoginCheck;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private User user;
 //    private DatabaseManager DBManager;

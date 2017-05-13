@@ -80,7 +80,6 @@ public class LoginCheck {
                         ConnectIMServerHelper.getInstance().connectIMServer(context, token);
                         // 设置登录状态监听
                         loginStatusChangedListener.onLoginStatusChanged(UserStatus.LOGIN_STATUS);
-                        Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show();
 
                         // 如果是LoginActivity登录的话，则关闭activity
                         String contextString = context.toString();

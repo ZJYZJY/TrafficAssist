@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.zjy.trafficassist.*;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.helper.PermissionHelper;
 import com.zjy.trafficassist.model.AlarmHistory;
 import com.zjy.trafficassist.utils.HttpUtil;
@@ -42,7 +44,7 @@ import static com.zjy.trafficassist.UserStatus.USER;
 import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_READ_STORAGE;
 import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
-public class PostMessage extends BaseActivity {
+public class PostAccident extends AppCompatActivity {
 
     private Button btn_commit;
     private Uri imageUri;
@@ -72,7 +74,7 @@ public class PostMessage extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // 请求读取内部存储权限
-        PermissionHelper.requestPermission(getApplicationContext(), PostMessage.this, REQUEST_READ_STORAGE);
+        PermissionHelper.requestPermission(getApplicationContext(), PostAccident.this, REQUEST_READ_STORAGE);
 
         container = (CoordinatorLayout) findViewById(R.id.post_container);
         btn_commit = (Button) findViewById(R.id.btn_commit);
@@ -89,7 +91,7 @@ public class PostMessage extends BaseActivity {
                 if(tag_car_type.getCheckedRadioButtonId() != -1
                         && tag_people_effect.getCheckedRadioButtonId() != -1
                         && tag_car_crash.getCheckedRadioButtonId() != -1){
-                    final ProgressDialog mPDialog = new ProgressDialog(PostMessage.this);
+                    final ProgressDialog mPDialog = new ProgressDialog(PostAccident.this);
                     mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     mPDialog.setMessage(getResources().getString(R.string.now_upload_history));
                     mPDialog.setCancelable(true);
@@ -114,7 +116,7 @@ public class PostMessage extends BaseActivity {
                     }
                     List<MultipartBody.Part> parts = HttpUtil.files2Parts("image[]", newPaths);
                     HttpUtil.addTextPart(parts, "accidentTags", accidentTags, parts.size());
-                    HttpUtil.addTextPart(parts, "nickname", USER.getRealname(), parts.size());
+                    HttpUtil.addTextPart(parts, "realname", USER.getRealname(), parts.size());
                     HttpUtil.addTextPart(parts, "username", USER.getUsername(), parts.size());
                     HttpUtil.addTextPart(parts, "longitude", USER.getLocation().longitude+"", parts.size());
                     HttpUtil.addTextPart(parts, "latitude", USER.getLocation().latitude+"", parts.size());
@@ -148,7 +150,7 @@ public class PostMessage extends BaseActivity {
                         }
                     });
                 }else{
-                    Toast.makeText(PostMessage.this, "请完整填写信息", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostAccident.this, "请完整填写信息", Toast.LENGTH_SHORT).show();
                 }
             }
         });

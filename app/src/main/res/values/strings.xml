@@ -14,6 +14,18 @@
     <string name="label_register">注册</string>
     <string name="label_edit_detail">报警信息</string>
     <string name="label_edit_user_info">编辑个人信息</string>
+    <string name="label_edit_issue">上报问题</string>
+    <string name="label_post_road_jam">拥堵</string>
+    <string name="label_post_road_construction">施工</string>
+    <string name="label_post_road_close">封路</string>
+    <string name="label_post_road_water">积水</string>
+
+    <!--上报问题类型-->
+    <string name="issue_kind">问题类型</string>
+    <string name="road_jam">拥堵</string>
+    <string name="road_water">积水</string>
+    <string name="road_close">封路</string>
+    <string name="road_construction">施工</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">用户名</string>

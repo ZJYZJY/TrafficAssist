@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,10 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.model.User;
-import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
 
@@ -29,7 +29,7 @@ import retrofit2.Response;
 
 import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
-public class SignupActivity extends BaseActivity {
+public class SignupActivity extends AppCompatActivity {
 
 //    private DatabaseManager DBManager;
     private User user;

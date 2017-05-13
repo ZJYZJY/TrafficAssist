@@ -1,4 +1,4 @@
-package com.zjy.trafficassist.ui;
+package com.zjy.trafficassist.base;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

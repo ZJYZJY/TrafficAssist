@@ -26,6 +26,7 @@ import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
 
 /**
  * com.zjy.trafficassist.utils
@@ -151,6 +152,14 @@ public class HttpUtil {
          */
         @GET(APIPath.MODIFY_USER_INFO)
         Call<ResponseBody> modifyUserInfo(@QueryMap Map<String, String> userInfo);
+
+        /**
+         * 用户驾驶行为数据上传接口
+         * @param parts 用户驾驶行为数据
+         */
+        @Multipart
+        @POST(APIPath.UPLOAD_DRIVING_BEHAVIOR_DATA)
+        Call<ResponseBody> uploadDrivingData(@Part List<MultipartBody.Part> parts);
     }
 
     private class APIPath{
@@ -165,6 +174,8 @@ public class HttpUtil {
 
         private static final String UPLOAD_HISTORY = "trafficassist/user/uploadHistory.php";
 
-        private static final String MODIFY_USER_INFO = "";
+        private static final String MODIFY_USER_INFO = "trafficassist/user/editInformation.php";
+
+        private static final String UPLOAD_DRIVING_BEHAVIOR_DATA = "trafficassist/user/uploadCar.php";
     }
 }

@@ -12,8 +12,6 @@ android {
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
-
-
     }
     buildTypes {
         release {
@@ -25,9 +23,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/AMap_3DMap_V3.2.1_20160225.jar')
-    compile files('libs/AMap_Location_v2.4.0_20160308.jar')
-    compile files('libs/AMap_Search_V3.2.1_20160308.jar')
+    compile files('libs/AMap3DMap_5.0.0_AMapNavi_5.0.1_AMapSearch_5.0.0_AMapLocation_3.4.0_20170427.jar')
     //    compile 'com.github.glassLake:PhotoPicker:1.0.2'
     // 使用Gson转换json
     // 使用RxJava2
@@ -40,6 +36,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.4.0'
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.android.support:support-vector-drawable:23.4.0'
+    compile 'com.github.clans:fab:1.6.4'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'

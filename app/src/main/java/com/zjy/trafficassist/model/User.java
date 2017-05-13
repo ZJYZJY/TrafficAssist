@@ -23,6 +23,10 @@ public class User {
         this.username = username;
         this.password = password;
         this.realname = username;
+
+        this.driverNumber = "";
+        this.driverType = "";
+        this.carNumber = "";
     }
 
     public String getDriverNumber() {

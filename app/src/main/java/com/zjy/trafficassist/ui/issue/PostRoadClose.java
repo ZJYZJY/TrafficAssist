@@ -1,31 +1,27 @@
-package com.zjy.trafficassist.ui;
+package com.zjy.trafficassist.ui.issue;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.base.SlidingActivity;
 
-public class DetailedInfo extends AppCompatActivity {
+public class PostRoadClose extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detailed_info);
+        setContentView(R.layout.activity_post_road_close);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
-                finish();
+                onBackPressed();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

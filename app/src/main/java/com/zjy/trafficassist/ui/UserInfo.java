@@ -8,15 +8,12 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.utils.LogUtil;
 
 public class UserInfo extends AppCompatActivity {
 

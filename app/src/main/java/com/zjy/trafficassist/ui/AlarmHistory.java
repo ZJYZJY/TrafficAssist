@@ -2,6 +2,7 @@ package com.zjy.trafficassist.ui;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zjy.trafficassist.BaseActivity;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.adapter.HistoryListAdapter;
-import com.zjy.trafficassist.helper.RecycleViewDivider;
 import com.zjy.trafficassist.listener.RecyclerItemClickListener;
 import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.TransForm;
@@ -30,7 +30,7 @@ import static com.zjy.trafficassist.UserStatus.USER;
 import static com.zjy.trafficassist.utils.HttpUtil.EMPTY;
 import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
-public class AlarmHistory extends BaseActivity implements RecyclerItemClickListener {
+public class AlarmHistory extends AppCompatActivity implements RecyclerItemClickListener {
 
 
     private static boolean FROM_INTERNET;

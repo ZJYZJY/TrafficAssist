@@ -94,29 +94,25 @@ public class TransForm {
     }
 
     /**
-     * 用当前系统时间为文件命名
+     * 用当前系统日期
      */
-    public static String DateFileName(String fileType) {
+    public static String getDate() {
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmss");
-        return fileType + dateFormat.format(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        return dateFormat.format(date);
+    }
+
+    /**
+     * 用当前系统时间
+     */
+    public static String getTime() {
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HHmmss");
+        return dateFormat.format(date);
     }
 
     public static String uuid(){
         return UUID.randomUUID().toString();
-    }
-
-    /**
-     * 将字节数组转换为Bitmap对象
-     */
-    public static Bitmap getPicFromBytes(byte[] bytes, BitmapFactory.Options opts) {
-        if (bytes != null)
-            if (opts != null)
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length,
-                        opts);
-            else
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        return null;
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.zjy.trafficassist.utils;
+package com.zjy.trafficassist.helper;
 
 import android.content.Context;
 import android.hardware.Sensor;

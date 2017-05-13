@@ -47,7 +47,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
                     .centerCrop()
                     .placeholder(R.mipmap.ic_launcher)
                     .into(holder.his_pic);
-            LogUtil.e(position + "  " + alarmHistories.get(position).getPicUrl().get(0));
+            LogUtil.i(position + "  " + alarmHistories.get(position).getPicUrl().get(0));
         }
     }
 
