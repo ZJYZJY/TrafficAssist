@@ -48,9 +48,9 @@ public class PhotoPickUtils {
 
     }
 
-    public static void startPick(Activity context,ArrayList<String> photos){
+    public static void startPick(Activity context,ArrayList<String> photos, int maxCount){
         PhotoPicker.builder()
-                .setPhotoCount(8)
+                .setPhotoCount(maxCount)
                 .setShowCamera(true)
                 .setShowGif(true)
                 .setSelected(photos)

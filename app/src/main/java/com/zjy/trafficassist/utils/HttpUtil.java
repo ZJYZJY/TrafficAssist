@@ -160,6 +160,14 @@ public class HttpUtil {
         @Multipart
         @POST(APIPath.UPLOAD_DRIVING_BEHAVIOR_DATA)
         Call<ResponseBody> uploadDrivingData(@Part List<MultipartBody.Part> parts);
+
+        /**
+         * 用户路况信息上传接口
+         * @param parts 用户驾驶行为数据
+         */
+        @Multipart
+        @POST(APIPath.UPLOAD_ROAD_ISSUE)
+        Call<ResponseBody> uploadRoadIssue(@Part List<MultipartBody.Part> parts);
     }
 
     private class APIPath{
@@ -177,5 +185,7 @@ public class HttpUtil {
         private static final String MODIFY_USER_INFO = "trafficassist/user/editInformation.php";
 
         private static final String UPLOAD_DRIVING_BEHAVIOR_DATA = "trafficassist/user/uploadCar.php";
+
+        private static final String UPLOAD_ROAD_ISSUE = "trafficassist/user/uploadRoadCondition.php";
     }
 }

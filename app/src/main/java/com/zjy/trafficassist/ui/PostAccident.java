@@ -83,6 +83,7 @@ public class PostAccident extends AppCompatActivity {
         tag_car_crash = (RadioGroup) findViewById(R.id.tag_car_crash);
 
         recyclerView = (MultiPickResultView) findViewById(R.id.image_picker);
+        recyclerView.setMaxCount(8);
         recyclerView.init(this, MultiPickResultView.ACTION_SELECT, null);
 
         btn_commit.setOnClickListener(new View.OnClickListener() {

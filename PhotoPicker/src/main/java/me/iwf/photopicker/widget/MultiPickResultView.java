@@ -61,6 +61,10 @@ public class MultiPickResultView extends FrameLayout {
         initEvent(context,attrs);
     }
 
+    public void setMaxCount(int count){
+        this.maxCount = count;
+    }
+
     private void initEvent(Context context, AttributeSet attrs) {
 
     }
@@ -72,7 +76,12 @@ public class MultiPickResultView extends FrameLayout {
     private void initView(Context context, AttributeSet attrs) {
 
         recyclerView = new android.support.v7.widget.RecyclerView(context,attrs);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, OrientationHelper.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, OrientationHelper.VERTICAL){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        });
         this.addView(recyclerView);
     }
 
@@ -94,7 +103,7 @@ public class MultiPickResultView extends FrameLayout {
         if (photos != null && photos.size() >0){
             selectedPhotos.addAll(photos);
         }
-        photoAdapter = new PhotoAdapter(context, selectedPhotos);
+        photoAdapter = new PhotoAdapter(context, selectedPhotos, maxCount);
         photoAdapter.setAction(action);
         recyclerView.setAdapter(photoAdapter);
         //recyclerView.setLayoutFrozen(true);

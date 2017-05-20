@@ -4,12 +4,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable\\rc_progress_sending_style.xml"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable\\rc_corner_voice_style.xml",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable\\rc_corner_voice_style.xml"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable\\rc_ic_files_selector.xml",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable\\rc_ic_files_selector.xml"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable\\rc_corner_voice_style.xml",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\src\\main\\res\\drawable\\rc_corner_voice_style.xml"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable\\rc_ic_phone_selector.xml",
