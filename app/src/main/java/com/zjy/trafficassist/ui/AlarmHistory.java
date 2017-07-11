@@ -1,27 +1,36 @@
 package com.zjy.trafficassist.ui;
 
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
-import com.zjy.trafficassist.BaseActivity;
-import com.zjy.trafficassist.DatabaseManager;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.adapter.HistoryListAdapter;
+import com.zjy.trafficassist.listener.RecyclerItemClickListener;
+import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.TransForm;
 import com.zjy.trafficassist.R;
-import com.zjy.trafficassist.WebService;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class AlarmHistory extends BaseActivity {
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.utils.HttpUtil.EMPTY;
+import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
+
+public class AlarmHistory extends AppCompatActivity implements RecyclerItemClickListener {
 
 
     private static boolean FROM_INTERNET;
@@ -31,7 +40,7 @@ public class AlarmHistory extends BaseActivity {
     private ArrayList<com.zjy.trafficassist.model.AlarmHistory> internet_history;
     private HistoryListAdapter historyListAdapter;
     private SwipeRefreshLayout RefreshLayout;
-    private DatabaseManager databaseManager;
+//    private DatabaseManager databaseManager;
 
 
     @Override
@@ -40,7 +49,7 @@ public class AlarmHistory extends BaseActivity {
         setContentView(R.layout.activity_alarm_history);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        databaseManager = new DatabaseManager(this);
+//        databaseManager = new DatabaseManager(this);
         RefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
         if (RefreshLayout != null) {
             RefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
@@ -52,76 +61,61 @@ public class AlarmHistory extends BaseActivity {
         historyList.setLayoutManager(new LinearLayoutManager(this));    //设置LinearLayoutManager
         historyList.setItemAnimator(new DefaultItemAnimator());         //设置ItemAnimator
         historyList.setHasFixedSize(true);                              //设置固定大小
+//        historyList.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager.VERTICAL,
+//                16, getResources().getColor(R.color.WHITE)));
 
         FROM_INTERNET = true;
-//        internet_history = new ArrayList<>();
-        internet_history = getListItem();
-//        local_history = getListItem();
-        /**
-         * 创建适配器
-         */
-//        historyListAdapter = new HistoryListAdapter(this, local_history);
-        historyListAdapter = new HistoryListAdapter(this, internet_history);
-        historyList.setAdapter(historyListAdapter);
+        getListItem();
 
         RefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 RefreshLayout.setRefreshing(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        FROM_INTERNET = true;
-                        internet_history = getListItem();
-                        RefreshLayout.setRefreshing(false);
-                    }
-                }, 3000);
+                FROM_INTERNET = true;
+                getListItem();
+                RefreshLayout.setRefreshing(false);
             }
         });
     }
 
-    private ArrayList<com.zjy.trafficassist.model.AlarmHistory> getListItem() {
+    private void getListItem() {
 
         final ArrayList<com.zjy.trafficassist.model.AlarmHistory> history_item = new ArrayList<>();
 
         if (FROM_INTERNET) {
-            final ProgressDialog mPDialog = new ProgressDialog(AlarmHistory.this);
-            mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mPDialog.setMessage(getResources().getString(R.string.now_loading));
-            mPDialog.setCancelable(true);
-            mPDialog.show();
-            new AsyncTask<Void, Void, ArrayList<com.zjy.trafficassist.model.AlarmHistory>>() {
-
+            HttpUtil.create().history(USER.getUsername()).enqueue(new Callback<ResponseBody>() {
                 @Override
-                protected ArrayList<com.zjy.trafficassist.model.AlarmHistory> doInBackground(Void... params) {
-
-                    String history_list = WebService.DownloadHistory();
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
-                        return TransForm.DownloadHistory(history_list);
-                    } catch (UnsupportedEncodingException e) {
+                        String res = response.body().string();
+                        List<com.zjy.trafficassist.model.AlarmHistory> list = TransForm.parseHistory(res);
+                        if(HttpUtil.stateCode(res) == SUCCESS){
+                            for (int i = 0; i < list.size(); i++) {
+                                history_item.add(list.get(i));
+                            }
+                            historyListAdapter = new HistoryListAdapter(AlarmHistory.this, history_item);
+                            historyListAdapter.setOnRecyclerItemClickListener(AlarmHistory.this);
+                            historyList.setAdapter(historyListAdapter);
+                            historyListAdapter.notifyDataSetChanged();
+                        }else if(HttpUtil.stateCode(res) == EMPTY){
+                            Toast.makeText(AlarmHistory.this, "没有历史记录", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    return null;
                 }
 
                 @Override
-                protected void onPostExecute(final ArrayList<com.zjy.trafficassist.model.AlarmHistory> ReturnCode) {
-                    super.onPostExecute(ReturnCode);
-                    if (ReturnCode != null) {
-                        for (int i = 0; i < ReturnCode.size(); i++) {
-                            history_item.add(ReturnCode.get(i));
-                        }
-                        mPDialog.dismiss();
-                        historyListAdapter.notifyDataSetChanged();
-                    } else {
-                        mPDialog.dismiss();
-                        Toast.makeText(AlarmHistory.this, "没有历史记录", Toast.LENGTH_SHORT).show();
-                    }
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(AlarmHistory.this, "连接失败", Toast.LENGTH_SHORT).show();
                 }
-            }.execute();
+            });
         }
-//        databaseManager.SaveHistory(item_history);
-        return history_item;
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "点击了 " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -8,8 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.listener.RecyclerItemClickListener;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.utils.LogUtil;
 
 import java.util.ArrayList;
 
@@ -20,6 +23,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
 
     private Context mContext;
     private ArrayList<AlarmHistory> alarmHistories;
+    private RecyclerItemClickListener mItemClickListener;
 
     public HistoryListAdapter(Context context, ArrayList<AlarmHistory> alarmHistories) {
         this.mContext = context;
@@ -29,8 +33,7 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_history, parent, false);
-//        v.setOnClickListener(this);
-        return new ViewHolder(v);
+        return new ViewHolder(v, mItemClickListener);
     }
 
     @Override
@@ -38,8 +41,14 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         holder.text_id.setText("ID：" + String.valueOf(getItemId(position) + 1));
         holder.text_username.setText("用户名：" + alarmHistories.get(position).getUsername());
         holder.text_acctag.setText("详情：" + alarmHistories.get(position).getaccidentTags());
-        if(alarmHistories.get(position).getPictures() != null)
-            holder.his_pic.setImageBitmap(alarmHistories.get(position).getPictures().get(0));
+        if(alarmHistories.get(position).getPicUrl() != null && alarmHistories.get(position).getPicUrl().size() > 0){
+            Glide.with(mContext)
+                    .load(alarmHistories.get(position).getPicUrl().get(0))
+                    .centerCrop()
+                    .placeholder(R.mipmap.ic_launcher)
+                    .into(holder.his_pic);
+            LogUtil.i(position + "  " + alarmHistories.get(position).getPicUrl().get(0));
+        }
     }
 
     @Override
@@ -52,19 +61,36 @@ public class HistoryListAdapter extends RecyclerView.Adapter<HistoryListAdapter.
         return alarmHistories == null ? 0 : alarmHistories.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView text_id;
         TextView text_username;
         TextView text_acctag;
         ImageView his_pic;
+        RecyclerItemClickListener ItemClickListener;
 
-        ViewHolder(View itemView) {
+        ViewHolder(View itemView, RecyclerItemClickListener ItemClickListener) {
             super(itemView);
             text_id = (TextView) itemView.findViewById(R.id.text_id);
             text_username = (TextView) itemView.findViewById(R.id.text_username);
             text_acctag = (TextView) itemView.findViewById(R.id.text_acctag);
             his_pic = (ImageView) itemView.findViewById(R.id.his_pic);
+
+            this.ItemClickListener = ItemClickListener;
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            if(view == itemView){
+                if(this.ItemClickListener != null){
+                    this.ItemClickListener.onItemClick(view, getLayoutPosition());
+                }
+            }
+        }
+    }
+
+    public void setOnRecyclerItemClickListener(RecyclerItemClickListener listener){
+        this.mItemClickListener = listener;
     }
 }

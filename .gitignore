@@ -7,3 +7,7 @@
 .DS_Store
 /build
 /captures
+app/.externalNativeBuild/
+projectFilesBackup/.idea/
+/IMLib/build
+/IMKit/build

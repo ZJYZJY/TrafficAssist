@@ -6,15 +6,18 @@ import com.zjy.trafficassist.model.User;
 
 /**
  * Created 2016/5/1.
- *
  * @author 郑家烨.
  * @function
  */
 public class UserStatus {
 
-    public static boolean Login_status = false;
-    public static User user = new User();
+    public static boolean LOGIN_STATUS = false;
+
+    public static User USER = new User();
+
     public static boolean first_show = true;
-    public static SharedPreferences sp;
-    public static SharedPreferences.Editor editor;
+
+    public static SharedPreferences SP;
+
+    public static SharedPreferences.Editor EDITOR;
 }

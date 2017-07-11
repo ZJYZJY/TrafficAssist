@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.helper.PermissionHelper;
 
 public class Welcome extends AppCompatActivity implements View.OnClickListener {
 
@@ -27,6 +28,9 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener {
         login.setOnClickListener(this);
         reg.setOnClickListener(this);
 
+        // 请求定位权限
+        PermissionHelper.requestPermission(getApplicationContext(), Welcome.this, PermissionHelper.REQUEST_LOCATION);
+
         sp = this.getSharedPreferences("first_check", MODE_PRIVATE);
         fristload = sp.getBoolean("fristload", true);
         if (!fristload) {
@@ -38,12 +42,14 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         editor = sp.edit();
         editor.putBoolean("fristload", false);
-        editor.commit();
+        editor.apply();
         switch (v.getId()){
             case R.id.wel_login:
+                startActivity(new Intent(Welcome.this, MapActivity.class));
                 startActivity(new Intent(Welcome.this, LoginActivity.class));
                 break;
             case R.id.wel_reg:
+                startActivity(new Intent(Welcome.this, MapActivity.class));
                 startActivity(new Intent(Welcome.this, SignupActivity.class));
                 break;
         }

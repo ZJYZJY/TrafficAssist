@@ -3,9 +3,9 @@ package com.zjy.trafficassist.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,16 +14,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.zjy.trafficassist.BaseActivity;
-import com.zjy.trafficassist.DatabaseManager;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.base.SlidingActivity;
 import com.zjy.trafficassist.model.User;
-import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
+import com.zjy.trafficassist.utils.HttpUtil;
+import com.zjy.trafficassist.utils.LogUtil;
 
-public class SignupActivity extends BaseActivity {
+import java.io.IOException;
 
-    private DatabaseManager DBManager;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
+
+public class SignupActivity extends AppCompatActivity {
+
+//    private DatabaseManager DBManager;
     private User user;
 
     private CoordinatorLayout container;
@@ -52,7 +60,7 @@ public class SignupActivity extends BaseActivity {
                 attemptSignUp();
             }
         });
-        DBManager = new DatabaseManager(this);
+//        DBManager = new DatabaseManager(this);
     }
 
     private void attemptSignUp(){
@@ -61,12 +69,12 @@ public class SignupActivity extends BaseActivity {
          * 初始化User对象
          */
         user = new User(new_username.getText().toString(), new_passname.getText().toString());
-        //MapActivity.user = user;
+        //MapActivity.USER = USER;
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
+        // Check for a valid password, if the USER entered one.
         if (!TextUtils.isEmpty(user.getPassword()) && !isPasswordValid(user.getPassword())) {
             new_passname.setError(getString(R.string.error_invalid_password));
             focusView = new_passname;
@@ -89,37 +97,39 @@ public class SignupActivity extends BaseActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // perform the user login attempt.
+            // perform the USER login attempt.
             final ProgressDialog mPDialog = new ProgressDialog(SignupActivity.this);
             mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             mPDialog.setMessage(getResources().getString(R.string.now_user_register));
             mPDialog.setCancelable(true);
             mPDialog.show();
-            new AsyncTask<Void, Void, Boolean>(){
-                String ReturnCode;
-
+            HttpUtil.create().signUp(user).enqueue(new Callback<ResponseBody>() {
                 @Override
-                protected Boolean doInBackground(Void... params) {
-                    ReturnCode = WebService.Register(user.getUsername(), user.getPassword());
-                    System.out.println(ReturnCode);
-                    return Boolean.parseBoolean(ReturnCode);
-                }
-
-                @Override
-                protected void onPostExecute(final Boolean success) {
-                    super.onPostExecute(success);
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     mPDialog.dismiss();
-                    if (success) {
-                        Toast.makeText(SignupActivity.this, "注册成功：" + ReturnCode, Toast.LENGTH_SHORT).show();
-                        UserStatus.Login_status = true;
-                        UserStatus.user = user;
-                        finish();
-                        startActivity(new Intent(SignupActivity.this, MapActivity.class));
-                    } else {
-                        Toast.makeText(SignupActivity.this, "注册失败：" + ReturnCode, Toast.LENGTH_SHORT).show();
+                    try {
+                        String res = response.body().string();
+                        if(HttpUtil.stateCode(res) == SUCCESS){
+                            Toast.makeText(SignupActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("username", new_username.getText().toString());
+                            intent.putExtra("password", new_passname.getText().toString());
+                            setResult(0, intent);
+                            finish();
+                        }else{
+                            Toast.makeText(SignupActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        LogUtil.e("IOException");
                     }
                 }
-            }.execute();
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(SignupActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

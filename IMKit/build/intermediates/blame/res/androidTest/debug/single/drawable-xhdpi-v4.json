@@ -448,12 +448,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\u1f47f.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_ic_yes.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_ic_yes.png"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\u26c5.png",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\u26c5.png"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_ic_yes.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_ic_yes.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\u1f629.png",
@@ -652,12 +652,12 @@
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_ic_voice_receive_play2.png"
     },
     {
-        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_btn_open_file_normal.png",
-        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_btn_open_file_normal.png"
-    },
-    {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_ic_volume_wraning.png",
         "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_ic_volume_wraning.png"
+    },
+    {
+        "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_btn_open_file_normal.png",
+        "source": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\bundles\\debug\\res\\drawable-xhdpi-v4\\rc_btn_open_file_normal.png"
     },
     {
         "merged": "D:\\AndroidStudioProjects\\TrafficAssist\\IMKit\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-xhdpi-v4\\rc_cs_group_list_divide_line.png",

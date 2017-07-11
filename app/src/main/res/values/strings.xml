@@ -9,8 +9,23 @@
     <string name="gravity_right">right</string>
 
     <string name="title_activity_login">登录/注册</string>
+
     <string name="label_login">登录</string>
     <string name="label_register">注册</string>
+    <string name="label_edit_detail">报警信息</string>
+    <string name="label_edit_user_info">编辑个人信息</string>
+    <string name="label_edit_issue">上报问题</string>
+    <string name="label_post_road_jam">拥堵</string>
+    <string name="label_post_road_construction">施工</string>
+    <string name="label_post_road_close">封路</string>
+    <string name="label_post_road_water">积水</string>
+
+    <!--上报问题类型-->
+    <string name="issue_kind">问题类型</string>
+    <string name="road_jam">拥堵</string>
+    <string name="road_water">积水</string>
+    <string name="road_close">封路</string>
+    <string name="road_construction">施工</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">用户名</string>
@@ -36,7 +51,29 @@
     <string name="now_upload_history">正在上传中…</string>
     <string name="now_user_login">正在登录…</string>
     <string name="now_user_register">注册中…</string>
-    <string name="title_activity_settings">设置</string>
+
+
+    <string name="tag_car_type">车辆型号</string>
+    <string name="tag_car_type1">危险品车</string>
+    <string name="tag_car_type2">中大型车</string>
+    <string name="tag_car_type3">小型车</string>
+
+    <string name="tag_people_effect">人员伤亡</string>
+    <string name="tag_people_effect1">人员受伤</string>
+    <string name="tag_people_effect2">人员死亡</string>
+    <string name="tag_people_effect3">较多人员伤亡</string>
+
+    <string name="tag_car_crash">车辆损坏</string>
+    <string name="tag_car_crash1">轻微碰擦</string>
+    <string name="tag_car_crash2">较少车辆损坏</string>
+    <string name="tag_car_crash3">连环碰撞</string>
+
+    <!--编辑用户信息-->
+    <string name="pref_edit_user_real_name">车主姓名</string>
+    <string name="pref_edit_user_phone_number">手机号</string>
+    <string name="pref_edit_user_driver_number">驾驶证号</string>
+    <string name="pref_edit_user_driver_type">准驾车型</string>
+    <string name="pref_edit_user_car_number">车牌号码</string>
 
     <!-- Strings related to Settings -->
 
@@ -109,4 +146,5 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_settings">设置</string>
 </resources>

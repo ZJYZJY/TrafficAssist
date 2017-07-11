@@ -1,13 +1,13 @@
 package com.zjy.trafficassist.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.zjy.trafficassist.BaseActivity;
 import com.zjy.trafficassist.R;
+import com.zjy.trafficassist.base.SlidingActivity;
 
-public class DetailedInfo extends BaseActivity {
+public class DetailedInfo extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

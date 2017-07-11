@@ -4,14 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.helper.DatabaseHelper;
 import com.zjy.trafficassist.model.User;
-
-import java.util.ArrayList;
 
 /**
  * Created by ZJY on 2016/4/14.
  */
+@Deprecated
 public class DatabaseManager {
 
     private DatabaseHelper helper;
@@ -54,7 +53,7 @@ public class DatabaseManager {
 //        try {
 //            for(int i = 0; i < alarmHistories.size(); i++) {
 //                database.execSQL("INSERT INTO user_history VALUES(null, ?, ?, ?, null)",
-//                        new Object[]{alarmHistories.get(i).getNickname(),
+//                        new Object[]{alarmHistories.get(i).getRealname(),
 //                                alarmHistories.get(i).getaccidentTags(),
 //                                String.valueOf(alarmHistories.get(i).isSerious())});
 //            }

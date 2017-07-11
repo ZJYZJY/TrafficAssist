@@ -3,10 +3,8 @@ package com.zjy.trafficassist.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,35 +38,46 @@ import com.amap.api.maps.model.CircleOptions;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
-import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.nearby.NearbyInfo;
 import com.amap.api.services.nearby.NearbySearch;
 import com.amap.api.services.nearby.NearbySearch.NearbyQuery;
 import com.amap.api.services.nearby.NearbySearchFunctionType;
 import com.amap.api.services.nearby.NearbySearchResult;
-import com.zjy.trafficassist.App;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.zjy.trafficassist.R;
 import com.zjy.trafficassist.UserStatus;
-import com.zjy.trafficassist.WebService;
-import com.zjy.trafficassist.model.User;
-import com.zjy.trafficassist.utils.SensorEventHelper;
+import com.zjy.trafficassist.helper.PermissionHelper;
+import com.zjy.trafficassist.listener.LoginStatusChangedListener;
+import com.zjy.trafficassist.helper.LoginHelper;
+import com.zjy.trafficassist.utils.AMapUtil;
+import com.zjy.trafficassist.utils.HttpUtil;
+import com.zjy.trafficassist.utils.LogUtil;
+import com.zjy.trafficassist.helper.SensorEventHelper;
+import com.zjy.trafficassist.utils.TransForm;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.rong.imkit.RongIM;
-import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-import static com.zjy.trafficassist.UserStatus.Login_status;
-import static com.zjy.trafficassist.UserStatus.editor;
-import static com.zjy.trafficassist.UserStatus.first_show;
-import static com.zjy.trafficassist.UserStatus.sp;
-import static com.zjy.trafficassist.UserStatus.user;
+import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
+import static com.zjy.trafficassist.UserStatus.USER;
+import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_LOCATION;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        LocationSource, AMapLocationListener, View.OnClickListener, NearbySearch.NearbyListener {
+        LocationSource, AMapLocationListener, View.OnClickListener,
+        NearbySearch.NearbyListener, LoginStatusChangedListener {
 
     /**
      * 定位圈的颜色
@@ -81,24 +90,28 @@ public class MapActivity extends AppCompatActivity
     private OnLocationChangedListener mListener;
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
+
     private Marker mLocMarker;
     private Circle mCircle;
     private LatLng location;
 
     private SensorEventHelper mSensorHelper;
-    private FloatingActionButton fab_post;
+    private FloatingActionButton post_accident, post_issue;
     private Button login;
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private LinearLayout unlogin, logined;
     private ImageView display_user_pic;
     private Button display_user_name;
+    private Handler handler;
+    private Runnable runnable;
+    private FloatingActionMenu fabMenu;
 
+    private float speed;
+    private float direction;
     private long exitTime = 0;
     private boolean mFirstFix = false;
     private Map<String, Boolean> supportConversation = new HashMap<>();
-
-    private UserLoginTask mAuthTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,79 +121,38 @@ public class MapActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        fab_post = (FloatingActionButton) findViewById(R.id.fab_post);
+        post_accident = (FloatingActionButton) findViewById(R.id.post_accident);
+        post_issue = (FloatingActionButton) findViewById(R.id.post_issue);
         View headerView = navigationView.getHeaderView(0);
         login = (Button) headerView.findViewById(R.id.login_map_aty);
         unlogin = (LinearLayout) headerView.findViewById(R.id.unlogin);
         logined = (LinearLayout) headerView.findViewById(R.id.logined);
         display_user_pic = (ImageView) headerView.findViewById(R.id.display_user_pic);
         display_user_name = (Button) headerView.findViewById(R.id.display_user_name);
+        fabMenu = (FloatingActionMenu) findViewById(R.id.menu);
 
-        fab_post.setOnClickListener(this);
+        post_accident.setOnClickListener(this);
+        post_issue.setOnClickListener(this);
         login.setOnClickListener(this);
 
+        // 请求定位权限
+        PermissionHelper.requestPermission(getApplicationContext(), MapActivity.this, REQUEST_LOCATION);
         //地图初始化
         mapView = (MapView) findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         Initial();
-        //获取附近实例
-        NearbySearch PoliceNearbySearch = NearbySearch.getInstance(getApplicationContext());
-        //设置附近监听
-        PoliceNearbySearch.addNearbyListener(this);
-//        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
 
-        connectIMServer("bDIjjHtLja1iRktPqjHfwdMnhDhvzg9jRuzXf1Haw/6PfyKlZHV1m/1pMTwBCa0sZanUGmejRpJ73wRgY7uc/Q==");
         // 设置支持聊天信息的类型
         supportConversation.put(Conversation.ConversationType.PRIVATE.getName(), false);
+        // 上传用户的驾驶行为数据
+        uploadDrivingBehaviorData();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         navigationView.setNavigationItemSelectedListener(this);
-
-        sp = this.getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        // 自动登录
-        if(sp.getString("USER_NAME", null) != null
-                && sp.getString("PASSWORD", null) != null){
-            user.setUsername(sp.getString("USER_NAME", ""));
-            user.setPassword(sp.getString("PASSWORD", ""));
-            Log.e("sp_userinfo", "sp" + user.getUsername() + user.getPassword());
-
-            mAuthTask = new UserLoginTask();
-            mAuthTask.execute();
-        }
-        // 保存用户名和密码
-        if(UserStatus.user != null){
-            editor = sp.edit();
-            editor.putString("USER_NAME", user.getUsername());
-            editor.putString("PASSWORD", user.getPassword());
-            editor.commit();
-        }
-
-//        new AsyncTask<Void, Void, Boolean>(){
-//
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                String result;
-//                result = WebService.Login(user.getUsername(), user.getPassword());
-//                return Boolean.parseBoolean(result);
-//            }
-//            @Override
-//
-//            protected void onPostExecute(final Boolean success) {
-//
-//                if (success) {
-//                    Login_status = true;
-//                } else {
-//                    Login_status = false;
-//                    Toast.makeText(MapActivity.this, "账户信息有误，请重新登录", Toast.LENGTH_SHORT).show();
-//                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
-//                }
-//            }
-//        };
     }
 
     /**
@@ -194,6 +166,25 @@ public class MapActivity extends AppCompatActivity
         }
         mSensorHelper = new SensorEventHelper(this);
         mSensorHelper.registerSensorListener();
+        // 自动登录
+        LoginHelper.getInstance().login(getApplicationContext(), this);
+    }
+
+
+    /**
+     * 登录状态监听
+     * @param loginStatus 用户登录状态
+     */
+    @Override
+    public void onLoginStatusChanged(boolean loginStatus) {
+        logined.setVisibility(loginStatus ? View.VISIBLE : View.GONE);
+        unlogin.setVisibility(loginStatus ? View.GONE : View.VISIBLE);
+        if(USER != null && loginStatus){
+            Toast.makeText(MapActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+            display_user_name.setText(USER.getUsername());
+        }else {
+            Toast.makeText(MapActivity.this, "注销成功", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -207,6 +198,44 @@ public class MapActivity extends AppCompatActivity
         aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         // 设置定位的类型为定位模式，参见类AMap。
         aMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_FOLLOW);
+    }
+
+    private void uploadDrivingBehaviorData(){
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                List<MultipartBody.Part> parts = new ArrayList<>();
+                HttpUtil.addTextPart(parts, "DATEDAY", TransForm.getDate(), parts.size());
+                HttpUtil.addTextPart(parts, "TIME", TransForm.getDate(), parts.size());
+                HttpUtil.addTextPart(parts, "CITY", USER.getCarNumber().substring(0, 2), parts.size());
+                HttpUtil.addTextPart(parts, "CAR_ID", USER.getCarNumber().substring(2), parts.size());
+                HttpUtil.addTextPart(parts, "JD", String.valueOf(location.longitude), parts.size());
+                HttpUtil.addTextPart(parts, "WD", String.valueOf(location.latitude), parts.size());
+                HttpUtil.addTextPart(parts, "SPEED", String.valueOf(AMapUtil.toKmPerHour(speed)), parts.size());
+                HttpUtil.addTextPart(parts, "DIRECTION", String.valueOf(direction), parts.size());
+
+                HttpUtil.create().uploadDrivingData(parts).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            String res = response.body().string();
+                            LogUtil.i(res);
+                            if(HttpUtil.stateCode(res) == HttpUtil.SUCCESS){
+                            } else {
+                                Toast.makeText(MapActivity.this, "上传驾驶行为数据失败", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                });
+                handler.postDelayed(this, 3000);
+            }
+        };
+        new Thread(runnable);
     }
 
     @Override
@@ -224,14 +253,15 @@ public class MapActivity extends AppCompatActivity
             //设置是否返回地址信息（默认返回地址信息）
             mLocationOption.setNeedAddress(true);
             //设置定位间隔,单位毫秒,默认为2000ms
-            mLocationOption.setInterval(2000);
+            mLocationOption.setInterval(3000);
+            //启用手机传感器,用于方位角与速度的获取
+            mLocationOption.setSensorEnable(true);
             //设置定位参数
             mlocationClient.setLocationOption(mLocationOption);
             // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
             mlocationClient.startLocation();
         }
     }
-
 
     @Override
     public void deactivate() {
@@ -255,7 +285,7 @@ public class MapActivity extends AppCompatActivity
 
     private Marker addMarker(LatLng latlng) {
         if (mLocMarker != null) {
-            return null;
+            return mLocMarker;
         }
 		BitmapDescriptor des = BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked);
         MarkerOptions options = new MarkerOptions();
@@ -273,14 +303,14 @@ public class MapActivity extends AppCompatActivity
     public void onLocationChanged(AMapLocation amapLocation) {
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
-                //显示系统小蓝点
-                //mListener.onLocationChanged(amapLocation);
                 location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
                 //搜索附近的交警信息
                 NearbySearchCondition();
-                if(UserStatus.user != null) {
-                    UserStatus.user.setLocation(location);
+                if(UserStatus.USER != null) {
+                    UserStatus.USER.setLocation(location);
                 }
+                speed = amapLocation.getSpeed();
+                direction = amapLocation.getBearing();
                 if (!mFirstFix) {
                     mFirstFix = true;
                     addCircle(location, amapLocation.getAccuracy());//添加定位精度圆
@@ -296,7 +326,7 @@ public class MapActivity extends AppCompatActivity
                 //mlocationClient.stopLocation(); //停止定位
             } else {
                 String errText = "定位失败," + amapLocation.getErrorCode() + ": " + amapLocation.getErrorInfo();
-                Log.e("AmapErr", errText);
+                LogUtil.e("AmapErr", errText);
                 Toast.makeText(getApplicationContext(), errText, Toast.LENGTH_LONG).show();
             }
         }
@@ -313,7 +343,6 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.map, menu);
         return true;
     }
@@ -352,6 +381,20 @@ public class MapActivity extends AppCompatActivity
                 aMap.setTrafficEnabled(true);
             }
             return true;
+        } else if (id == R.id.rt_cruise){
+            if(LOGIN_STATUS){
+                //设置巡航模式
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    handler.removeCallbacks(runnable);
+                } else {
+                    item.setChecked(true);
+                    handler.postDelayed(runnable, 2000);
+                }
+            } else {
+                Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -361,26 +404,26 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //侧边导航栏按键监听事件
         int id = item.getItemId();
-        if(Login_status) {
+        if(LOGIN_STATUS) {
             if (id == R.id.user_info) {
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
             } else if (id == R.id.alarm_history) {
                 startActivity(new Intent(MapActivity.this, AlarmHistory.class));
-            } else if (id == R.id.nav_refer) {
-
+            } else if (id == R.id.nav_service) {
+                startActivity(new Intent(MapActivity.this, NearbyService.class));
             }
         }else {
             Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(MapActivity.this, LoginActivity.class));
+            startLoginActivity();
         }
         if (id == R.id.nav_setting) {
-
+            startActivity(new Intent(MapActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_chat) {
             RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
         } else if(id == R.id.nav_about){
 
-//            Toast.makeText(MapActivity.this, "数据库有" + (new DatabaseManager(this)).getUserCount()
-//                    + "条数据", Toast.LENGTH_SHORT).show();
+        } else if(id == R.id.nav_exit){
+            LoginHelper.getInstance().logout(getApplicationContext(), this);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -390,22 +433,37 @@ public class MapActivity extends AppCompatActivity
     public void onClick(View v) {
         //主界面按钮监听事件
         switch (v.getId()) {
-            case R.id.fab_post:
-                if(Login_status)
-                    startActivity(new Intent(MapActivity.this, PostMessage.class));
-                else{
+            case R.id.post_accident:
+                if(LOGIN_STATUS){
+                    startActivity(new Intent(MapActivity.this, PostAccident.class));
+                    fabMenu.close(true);
+                } else{
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                    startLoginActivity();
+                }
+                break;
+            case R.id.post_issue:
+                if(LOGIN_STATUS){
+                    startActivity(new Intent(MapActivity.this, PostIssue.class));
+                    fabMenu.close(true);
+                }else{
+                    Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
+                    startLoginActivity();
                 }
                 break;
             case R.id.login_map_aty:
-                startActivity(new Intent(MapActivity.this, LoginActivity.class));
+                startLoginActivity();
                 break;
             case R.id.display_user_name:
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
+    }
+
+    public void startLoginActivity(){
+        LoginActivity.setOnLoginStatusChanged(this);
+        startActivity(new Intent(MapActivity.this, LoginActivity.class));
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -428,17 +486,12 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-//        if (Login_status && first_show) {
-//            Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-//            display_user_name.setText(user.getUsername());
-//            first_show = false;
-//        }
-        logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
-        unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
         if (mSensorHelper == null) {
             mSensorHelper = new SensorEventHelper(this);
         }
         mSensorHelper.registerSensorListener();
+        //注册附近监听
+        NearbySearch.getInstance(getApplicationContext()).addNearbyListener(this);
     }
 
     @Override
@@ -450,7 +503,8 @@ public class MapActivity extends AppCompatActivity
             mSensorHelper = null;
         }
         mapView.onPause();
-        mFirstFix = false;
+        //移除附近监听
+        NearbySearch.getInstance(getApplicationContext()).removeNearbyListener(this);
     }
 
     @Override
@@ -468,13 +522,13 @@ public class MapActivity extends AppCompatActivity
     public void NearbySearchCondition(){
         NearbyQuery query = new NearbyQuery();
         //设置搜索的中心点
-        query.setCenterPoint(new LatLonPoint(location.latitude, location.longitude));
+        query.setCenterPoint(AMapUtil.convertToLatLonPoint(location));
         //设置搜索的坐标体系
         query.setCoordType(NearbySearch.AMAP);
         //设置搜索半径
         query.setRadius(5000);
         //设置查询的时间
-        query.setTimeRange(10000);
+        query.setTimeRange(30 * 1000);
         //设置查询的方式驾车还是距离
         query.setType(NearbySearchFunctionType.DRIVING_DISTANCE_SEARCH);
         //调用异步查询接口
@@ -489,21 +543,22 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onNearbyInfoSearched(NearbySearchResult nearbySearchResult, int i) {
-    //搜索周边附近用户回调处理
+        //搜索周边附近用户回调处理
         if(i == 1000){
             if (nearbySearchResult != null
                     && nearbySearchResult.getNearbyInfoList() != null
                     && nearbySearchResult.getNearbyInfoList().size() > 0) {
-                NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
-                Log.e("NearbySearchResult",
-                        "周边搜索结果为size " + nearbySearchResult.getNearbyInfoList().size() +
-                                " first："+ nearbyInfo.getUserID() + "  " +
-                                nearbyInfo.getDistance()+ "  " +
-                                nearbyInfo.getDrivingDistance() + "  " +
-                                nearbyInfo.getTimeStamp() + "  " +
-                                nearbyInfo.getPoint().toString());
+                for(int k = 0; k < nearbySearchResult.getNearbyInfoList().size(); k++ ){
+                    NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
+                    LogUtil.d("NearbySearchResult", "周边搜索结果" + k + "：   "
+                                    + "ID：" + nearbyInfo.getUserID() + "\n"
+                                    + "Distance：" + nearbyInfo.getDistance() + "   "
+                                    + "DrivingDistance：" + nearbyInfo.getDrivingDistance() + "\n"
+                                    + "TimeStamp：" + nearbyInfo.getTimeStamp() + "\n"
+                                    + "Loc：" + nearbyInfo.getPoint().toString());
+                }
             } else {
-                Log.e("NearbySearchResult", "周边搜索结果为空");
+                LogUtil.d("NearbySearchResult", "周边搜索结果为空");
             }
         }
         else{
@@ -514,89 +569,5 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onNearbyInfoUploaded(int i) {
 
-    }
-
-    public void connectIMServer(String token) {
-
-        if (getApplicationInfo().packageName.equals(App.getCurProcessName(getApplicationContext()))) {
-
-            RongIM.connect(token, new RongIMClient.ConnectCallback() {
-
-                /**
-                 * Token 错误。可以从下面两点检查 1.  Token 是否过期，如果过期您需要向 App Server 重新请求一个新的 Token
-                 *                  2.  token 对应的 appKey 和工程里设置的 appKey 是否一致
-                 */
-                @Override
-                public void onTokenIncorrect() {
-                    Log.d("LoginActivity", "--onTokenIncorrect--");
-                }
-
-                /**
-                 * 连接融云成功
-                 * @param userid 当前 token 对应的用户 id
-                 */
-                @Override
-                public void onSuccess(String userid) {
-                    Log.d("LoginActivity", "--onSuccess--" + userid);
-                    Toast.makeText(MapActivity.this, userid + " 登陆成功", Toast.LENGTH_SHORT).show();
-                }
-
-                /**
-                 * 连接融云失败
-                 * @param errorCode 错误码，可到官网 查看错误码对应的注释
-                 */
-                @Override
-                public void onError(RongIMClient.ErrorCode errorCode) {
-                    Log.d("LoginActivity", "--onError--" + errorCode);
-                }
-            });
-        }
-    }
-
-    /**
-     * 后台线程进行登陆操作
-     * @ReturnCode String "true" or "false"
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private String ReturnCode;
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-            ReturnCode = WebService.Login(user.getUsername(), user.getPassword());
-            System.out.println(ReturnCode);
-            return Boolean.parseBoolean(ReturnCode);
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-
-            if (success) {
-                Login_status = true;
-                if (first_show) {
-                    Snackbar.make(fab_post, "登陆成功", Snackbar.LENGTH_LONG).show();
-                    display_user_name.setText(user.getUsername());
-                    first_show = false;
-                }
-                logined.setVisibility(Login_status ? View.VISIBLE : View.GONE);
-                unlogin.setVisibility(Login_status ? View.GONE : View.VISIBLE);
-            } else {
-                Toast.makeText(MapActivity.this, ReturnCode, Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-        }
     }
 }
