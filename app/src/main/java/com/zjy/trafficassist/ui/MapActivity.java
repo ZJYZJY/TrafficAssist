@@ -50,6 +50,8 @@ import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.helper.PermissionHelper;
 import com.zjy.trafficassist.listener.LoginStatusChangedListener;
 import com.zjy.trafficassist.helper.LoginHelper;
+import com.zjy.trafficassist.model.RoadIssue;
+import com.zjy.trafficassist.overlay.PointOverlay;
 import com.zjy.trafficassist.utils.AMapUtil;
 import com.zjy.trafficassist.utils.HttpUtil;
 import com.zjy.trafficassist.utils.LogUtil;
@@ -61,6 +63,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.rong.imkit.RongIM;
 import io.rong.imlib.model.Conversation;
@@ -73,23 +76,25 @@ import retrofit2.Response;
 import static com.zjy.trafficassist.UserStatus.LOGIN_STATUS;
 import static com.zjy.trafficassist.UserStatus.USER;
 import static com.zjy.trafficassist.helper.PermissionHelper.REQUEST_LOCATION;
+import static com.zjy.trafficassist.utils.HttpUtil.SUCCESS;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         LocationSource, AMapLocationListener, View.OnClickListener,
-        NearbySearch.NearbyListener, LoginStatusChangedListener {
+        NearbySearch.NearbyListener, LoginStatusChangedListener, AMap.OnMarkerClickListener {
 
     /**
      * 定位圈的颜色
      */
     private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
-    private static final int FILL_COLOR   = Color.argb(10, 0, 0, 180);
+    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
 
     private MapView mapView;
     private AMap aMap;
     private OnLocationChangedListener mListener;
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
+    private  PointOverlay pointOverlay;
 
     private Marker mLocMarker;
     private Circle mCircle;
@@ -110,8 +115,10 @@ public class MapActivity extends AppCompatActivity
     private float speed;
     private float direction;
     private long exitTime = 0;
+    private int locateCount = -1;
     private boolean mFirstFix = false;
     private Map<String, Boolean> supportConversation = new HashMap<>();
+    private ArrayList<RoadIssue> issues = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,21 +175,22 @@ public class MapActivity extends AppCompatActivity
         mSensorHelper.registerSensorListener();
         // 自动登录
         LoginHelper.getInstance().login(getApplicationContext(), this);
+        aMap.setOnMarkerClickListener(this);
     }
-
 
     /**
      * 登录状态监听
+     *
      * @param loginStatus 用户登录状态
      */
     @Override
     public void onLoginStatusChanged(boolean loginStatus) {
         logined.setVisibility(loginStatus ? View.VISIBLE : View.GONE);
         unlogin.setVisibility(loginStatus ? View.GONE : View.VISIBLE);
-        if(USER != null && loginStatus){
+        if (USER != null && loginStatus) {
             Toast.makeText(MapActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
             display_user_name.setText(USER.getUsername());
-        }else {
+        } else {
             Toast.makeText(MapActivity.this, "注销成功", Toast.LENGTH_SHORT).show();
         }
     }
@@ -200,7 +208,46 @@ public class MapActivity extends AppCompatActivity
         aMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_FOLLOW);
     }
 
-    private void uploadDrivingBehaviorData(){
+    public void showRoadIssueMarkers(){
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        HttpUtil.addTextPart(parts, "longitude", location.longitude + "", parts.size());
+        HttpUtil.addTextPart(parts, "latitude", location.latitude + "", parts.size());
+        HttpUtil.create().showRoadIssue(parts).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    String res = response.body().string();
+                    if (HttpUtil.stateCode(res) == SUCCESS) {
+                        issues = TransForm.parseRoadIssue(res);
+                        if(pointOverlay != null)
+                            pointOverlay.remove();
+                        pointOverlay = new PointOverlay(MapActivity.this, aMap, issues);
+                        pointOverlay.addToMap();
+                    } else {
+                        Toast.makeText(MapActivity.this, "无法获取路况信息", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    LogUtil.e("Exception:" + e.toString());
+                }
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(MapActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if(Objects.equals(marker.getOptions().getTitle(), "road_issue")){
+            int index = Integer.valueOf(marker.getOptions().getSnippet());
+            pointOverlay.showBSDialog(issues.get(index));
+        }
+        return true;
+    }
+
+    private void uploadDrivingBehaviorData() {
         handler = new Handler();
         runnable = new Runnable() {
             @Override
@@ -221,7 +268,7 @@ public class MapActivity extends AppCompatActivity
                         try {
                             String res = response.body().string();
                             LogUtil.i(res);
-                            if(HttpUtil.stateCode(res) == HttpUtil.SUCCESS){
+                            if (HttpUtil.stateCode(res) == SUCCESS) {
                             } else {
                                 Toast.makeText(MapActivity.this, "上传驾驶行为数据失败", Toast.LENGTH_SHORT).show();
                             }
@@ -229,8 +276,10 @@ public class MapActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
                     }
+
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    }
                 });
                 handler.postDelayed(this, 3000);
             }
@@ -287,7 +336,7 @@ public class MapActivity extends AppCompatActivity
         if (mLocMarker != null) {
             return mLocMarker;
         }
-		BitmapDescriptor des = BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked);
+        BitmapDescriptor des = BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked);
         MarkerOptions options = new MarkerOptions();
         options.icon(des);
         options.anchor(0.5f, 0.5f);
@@ -303,10 +352,18 @@ public class MapActivity extends AppCompatActivity
     public void onLocationChanged(AMapLocation amapLocation) {
         if (mListener != null && amapLocation != null) {
             if (amapLocation.getErrorCode() == 0) {
+                locateCount++;
                 location = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
                 //搜索附近的交警信息
                 NearbySearchCondition();
-                if(UserStatus.USER != null) {
+                // 获取路况信息
+                if(locateCount == 5){
+                    locateCount = 0;
+                }
+                if(locateCount == 0){
+                    showRoadIssueMarkers();
+                }
+                if (UserStatus.USER != null) {
                     UserStatus.USER.setLocation(location);
                 }
                 speed = amapLocation.getSpeed();
@@ -321,7 +378,7 @@ public class MapActivity extends AppCompatActivity
                     mCircle.setRadius(amapLocation.getAccuracy());// 改变定位精度圆半径
                     mLocMarker.setPosition(location);
                 }
-                if(mSensorHelper != null)
+                if (mSensorHelper != null)
                     mSensorHelper.setCurrentMarker(mLocMarker);//定位图标旋转
                 //mlocationClient.stopLocation(); //停止定位
             } else {
@@ -381,8 +438,8 @@ public class MapActivity extends AppCompatActivity
                 aMap.setTrafficEnabled(true);
             }
             return true;
-        } else if (id == R.id.rt_cruise){
-            if(LOGIN_STATUS){
+        } else if (id == R.id.rt_cruise) {
+            if (LOGIN_STATUS) {
                 //设置巡航模式
                 if (item.isChecked()) {
                     item.setChecked(false);
@@ -404,7 +461,7 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //侧边导航栏按键监听事件
         int id = item.getItemId();
-        if(LOGIN_STATUS) {
+        if (LOGIN_STATUS) {
             if (id == R.id.user_info) {
                 startActivity(new Intent(MapActivity.this, UserInfo.class));
             } else if (id == R.id.alarm_history) {
@@ -412,7 +469,7 @@ public class MapActivity extends AppCompatActivity
             } else if (id == R.id.nav_service) {
                 startActivity(new Intent(MapActivity.this, NearbyService.class));
             }
-        }else {
+        } else {
             Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
             startLoginActivity();
         }
@@ -420,9 +477,9 @@ public class MapActivity extends AppCompatActivity
             startActivity(new Intent(MapActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_chat) {
             RongIM.getInstance().startConversationList(MapActivity.this, supportConversation);
-        } else if(id == R.id.nav_about){
+        } else if (id == R.id.nav_about) {
 
-        } else if(id == R.id.nav_exit){
+        } else if (id == R.id.nav_exit) {
             LoginHelper.getInstance().logout(getApplicationContext(), this);
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -434,19 +491,19 @@ public class MapActivity extends AppCompatActivity
         //主界面按钮监听事件
         switch (v.getId()) {
             case R.id.post_accident:
-                if(LOGIN_STATUS){
+                if (LOGIN_STATUS) {
                     startActivity(new Intent(MapActivity.this, PostAccident.class));
                     fabMenu.close(true);
-                } else{
+                } else {
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
                     startLoginActivity();
                 }
                 break;
             case R.id.post_issue:
-                if(LOGIN_STATUS){
+                if (LOGIN_STATUS) {
                     startActivity(new Intent(MapActivity.this, PostIssue.class));
                     fabMenu.close(true);
-                }else{
+                } else {
                     Toast.makeText(MapActivity.this, "请您先登录", Toast.LENGTH_SHORT).show();
                     startLoginActivity();
                 }
@@ -461,15 +518,15 @@ public class MapActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void startLoginActivity(){
+    public void startLoginActivity() {
         LoginActivity.setOnLoginStatusChanged(this);
         startActivity(new Intent(MapActivity.this, LoginActivity.class));
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 按下键盘上返回按钮出现退出提示
-        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
-            if((System.currentTimeMillis() - exitTime) > 2000){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
                 Toast.makeText(MapActivity.this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 exitTime = System.currentTimeMillis();
             } else {
@@ -511,7 +568,7 @@ public class MapActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-        if(null != mlocationClient){
+        if (null != mlocationClient) {
             mlocationClient.onDestroy();
         }
         NearbySearch.destroy();
@@ -519,7 +576,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     //设置搜索条件
-    public void NearbySearchCondition(){
+    public void NearbySearchCondition() {
         NearbyQuery query = new NearbyQuery();
         //设置搜索的中心点
         query.setCenterPoint(AMapUtil.convertToLatLonPoint(location));
@@ -544,25 +601,24 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onNearbyInfoSearched(NearbySearchResult nearbySearchResult, int i) {
         //搜索周边附近用户回调处理
-        if(i == 1000){
+        if (i == 1000) {
             if (nearbySearchResult != null
                     && nearbySearchResult.getNearbyInfoList() != null
                     && nearbySearchResult.getNearbyInfoList().size() > 0) {
-                for(int k = 0; k < nearbySearchResult.getNearbyInfoList().size(); k++ ){
+                for (int k = 0; k < nearbySearchResult.getNearbyInfoList().size(); k++) {
                     NearbyInfo nearbyInfo = nearbySearchResult.getNearbyInfoList().get(0);
                     LogUtil.d("NearbySearchResult", "周边搜索结果" + k + "：   "
-                                    + "ID：" + nearbyInfo.getUserID() + "\n"
-                                    + "Distance：" + nearbyInfo.getDistance() + "   "
-                                    + "DrivingDistance：" + nearbyInfo.getDrivingDistance() + "\n"
-                                    + "TimeStamp：" + nearbyInfo.getTimeStamp() + "\n"
-                                    + "Loc：" + nearbyInfo.getPoint().toString());
+                            + "ID：" + nearbyInfo.getUserID() + "\n"
+                            + "Distance：" + nearbyInfo.getDistance() + "   "
+                            + "DrivingDistance：" + nearbyInfo.getDrivingDistance() + "\n"
+                            + "TimeStamp：" + nearbyInfo.getTimeStamp() + "\n"
+                            + "Loc：" + nearbyInfo.getPoint().toString());
                 }
             } else {
                 LogUtil.d("NearbySearchResult", "周边搜索结果为空");
             }
-        }
-        else{
-            Log.e("NearbySearchResult", "周边搜索出现异常，异常码为："+ i);
+        } else {
+            Log.e("NearbySearchResult", "周边搜索出现异常，异常码为：" + i);
         }
     }
 

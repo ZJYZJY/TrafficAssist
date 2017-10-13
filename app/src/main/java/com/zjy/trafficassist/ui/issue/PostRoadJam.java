@@ -203,13 +203,12 @@ public class PostRoadJam extends AppCompatActivity implements GeocodeSearch.OnGe
                     try {
                         String res = response.body().string();
                         LogUtil.e(res);
-                        JSONObject json = new JSONObject(res);
                         if(HttpUtil.stateCode(res) == SUCCESS){
                             Toast.makeText(PostRoadJam.this, "上报成功", Toast.LENGTH_SHORT).show();
                         }else {
                             Toast.makeText(PostRoadJam.this, "上报失败", Toast.LENGTH_SHORT).show();
                         }
-                    } catch (JSONException | IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                         LogUtil.e("Exception:" + e.toString());
                     }

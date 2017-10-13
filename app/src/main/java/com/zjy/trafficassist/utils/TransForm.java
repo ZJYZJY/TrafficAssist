@@ -4,11 +4,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.widget.AppCompatDrawableManager;
 
 import com.zjy.trafficassist.UserStatus;
 import com.zjy.trafficassist.model.AlarmHistory;
+import com.zjy.trafficassist.model.RoadIssue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +37,7 @@ import static com.zjy.trafficassist.UserStatus.USER;
  */
 public class TransForm {
 
-    // 解析从服务器传回的JSON数据
+    // 解析从服务器传回的历史记录的JSON数据
     public static ArrayList<AlarmHistory> parseHistory(String json)
             throws UnsupportedEncodingException {
         if (json == null)
@@ -64,6 +70,7 @@ public class TransForm {
         return alarmHistories;
     }
 
+    // 同步用户的个人信息
     public static void syncUserInfo(String res, Context context){
         if (res != null){
             try {
@@ -93,6 +100,34 @@ public class TransForm {
         }
     }
 
+    // 获取附近的路况信息
+    public static ArrayList<RoadIssue> parseRoadIssue(String res){
+        ArrayList<RoadIssue> issues = new ArrayList<>();
+        if (res != null){
+            try {
+                JSONObject json = new JSONObject(res);
+                JSONArray info = json.getJSONArray("info");
+                for(int i = 0; i < info.length(); i++){
+                    JSONObject item = info.getJSONObject(i);
+                    String picUrl = item.getString("picUrl");
+                    String issueType = item.getString("issueType");
+                    String direction = item.getString("direction");
+                    String detail_tag = item.getString("detail_tag");
+                    String detail = item.getString("detail");
+                    String address = item.getString("address");
+                    double longitude = item.getDouble("longitude");
+                    double latitude = item.getDouble("latitude");
+                    issues.add(new RoadIssue(picUrl, issueType, direction, detail_tag,
+                            detail, address, longitude, latitude));
+                }
+                return issues;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * 用当前系统日期
      */
@@ -113,6 +148,21 @@ public class TransForm {
 
     public static String uuid(){
         return UUID.randomUUID().toString();
+    }
+
+    public static Bitmap getBitmapFromVectorDrawable(Context context, int drawableId) {
+        Drawable drawable = AppCompatDrawableManager.get().getDrawable(context, drawableId);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            drawable = (DrawableCompat.wrap(drawable)).mutate();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     /**
